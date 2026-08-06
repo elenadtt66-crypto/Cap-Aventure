@@ -73,54 +73,67 @@ export async function getVehicles(): Promise<Vehicle[]> {
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
+  const cleanSlug = decodeURIComponent(slug || '').trim().toLowerCase();
+  const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
+
   try {
-    if (db.app.options.projectId === 'mock-project-id') {
-      const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
-      return allMocks.find(v => v.slug === slug) || null;
+    if (db.app.options.projectId !== 'mock-project-id') {
+      try {
+        const q = query(collection(db, 'vehicles'), where('slug', '==', slug));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const docSnap = querySnapshot.docs[0];
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            slug: data.slug || '',
+            name: data.name || '',
+            type: data.type || 'van_amenege',
+            description: data.description || '',
+            pricePerDay: data.pricePerDay || 0,
+            seats: data.seats || 2,
+            beds: data.beds || 2,
+            features: data.features || [],
+            images: data.images || [],
+            available: data.available !== false,
+            location: data.location || 'Bordeaux',
+            owner: data.owner || {
+              name: 'Propriétaire',
+              avatar: 'https://i.pravatar.cc/150?u=Owner',
+              responseTime: 'En moins d\'une heure',
+              responseRate: 100
+            },
+            techSpecs: data.techSpecs || {
+              fuel: 'Diesel',
+              transmission: 'Manuelle',
+              consumption: '8L/100km',
+              enginePower: '130 ch'
+            },
+            rating: data.rating || 5.0,
+            reviewCount: data.reviewCount || 0,
+            reviews: data.reviews || [],
+          };
+        }
+      } catch (firestoreErr) {
+        console.warn('Firestore fallback to local dataset:', firestoreErr);
+      }
     }
-    const q = query(collection(db, 'vehicles'), where('slug', '==', slug));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const docSnap = querySnapshot.docs[0];
-      const data = docSnap.data();
-      return {
-        id: docSnap.id,
-        slug: data.slug || '',
-        name: data.name || '',
-        type: data.type || 'van_amenege',
-        description: data.description || '',
-        pricePerDay: data.pricePerDay || 0,
-        seats: data.seats || 2,
-        beds: data.beds || 2,
-        features: data.features || [],
-        images: data.images || [],
-        available: data.available !== false,
-        location: data.location || 'Bordeaux',
-        owner: data.owner || {
-          name: 'Propriétaire',
-          avatar: 'https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
-          responseTime: 'En moins d\'une heure',
-          responseRate: 100
-        },
-        techSpecs: data.techSpecs || {
-          fuel: 'Diesel',
-          transmission: 'Manuelle',
-          consumption: '8L/100km',
-          enginePower: '130 ch'
-        },
-        rating: data.rating || 5.0,
-        reviewCount: data.reviewCount || 0,
-        reviews: data.reviews || [],
-      };
-    }
-    
-    const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
-    const mockFound = allMocks.find(v => v.slug === slug);
+
+    // Recherche robuste dans le jeu de données local (par slug exact, ID exact ou slug nettoyé)
+    const mockFound = allMocks.find(
+      v => v.slug.toLowerCase() === cleanSlug || 
+           v.id.toLowerCase() === cleanSlug ||
+           v.slug.toLowerCase().includes(cleanSlug) ||
+           cleanSlug.includes(v.slug.toLowerCase())
+    );
+
     return mockFound || null;
   } catch (error) {
     console.error('Error fetching vehicle by slug:', error);
-    const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
-    const mockFound = allMocks.find(v => v.slug === slug);
+    const mockFound = allMocks.find(
+      v => v.slug.toLowerCase() === cleanSlug || 
+           v.id.toLowerCase() === cleanSlug
+    );
     return mockFound || null;
   }
 }
