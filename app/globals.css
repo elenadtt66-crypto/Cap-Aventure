@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-body: var(--font-dm), system-ui, sans-serif;
+  
+  /* ——— Palette Cap Aventure — Navy + Or sur fond blanc propre ——— */
+  /* Couleurs du logo : Navy #1C2B4A | Or #C9A035 — fond neutre lumineux */
+
+  --color-brand-beige: #F8F8F6;          /* Blanc cassé neutre — propre, pas kaki */
+  --color-brand-card: #FFFFFF;
+  --color-brand-hover: #F2F2F0;          /* Gris très clair au hover — neutre */
+  --color-brand-border: #E8E8E4;         /* Bordure gris clair légèrement warm */
+
+  --color-brand-text: #1C2B4A;           /* Navy — couleur exacte du logo */
+  --color-brand-muted: #6B7A94;          /* Navy-gris — textes secondaires */
+
+  --color-brand-accent: #C9A035;         /* Or — couleur exacte du logo */
+  --color-brand-accent-hover: #A8832A;   /* Or foncé au hover */
+
+  --color-brand-navy: #1C2B4A;           /* Alias explicite — Navy logo */
+  --color-brand-navy-hover: #142038;     /* Navy profond au hover */
+  --color-brand-gold: #C9A035;           /* Alias explicite — Or logo */
+  --color-brand-gold-light: #FEF3CD;     /* Teinte or claire (badges, fonds) */
+
+  --color-brand-secondary: #1C2B4A;      /* Navy comme secondaire */
+  --color-brand-secondary-hover: #142038;
+
+  --color-brand-success: #16A34A;
+  --color-brand-warning: #CA8A04;
+  --color-brand-error: #DC2626;
+}
+
+:root {
+  --background: #F8F8F6;
+  --foreground: #1C2B4A;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =============================================
+   TEXTURE DE FOND PREMIUM (effet grain)
+   ============================================= */
+.grain-bg {
+  position: relative;
+}
+.grain-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* =============================================
+   MICRO-INTERACTIONS & HOVER EFFECTS
+   ============================================= */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(28, 43, 74, 0.14), 0 4px 8px -2px rgba(201, 160, 53, 0.08);
+}
+
+.btn-transition {
+  transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-transition:hover {
+  transform: scale(1.02);
+}
+.btn-transition:active {
+  transform: scale(0.98);
+}
+
+/* =============================================
+   KEYFRAMES — ANIMATIONS DE BASE
+   ============================================= */
+
+/* Fade in doux (utilisé partout) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale up (pour les modales et succès) */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in depuis la droite */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in depuis le haut */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer pour skeletons */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Float doux — icônes décoratives */
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Pulse gold glow — accordé au brand Or */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 160, 53, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(201, 160, 53, 0.10); }
+}
+
+/* Fade in stagger pour les listes */
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================
+   CLASSES D'ANIMATION
+   ============================================= */
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-float {
+  animation: floatSoft 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Stagger children — appliqué au parent */
+.stagger-children > * {
+  animation: staggerFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 320ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 560ms; }
+
+/* =============================================
+   SCROLLBAR PERSONNALISÉE
+   ============================================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F4EE;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A035;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1C2B4A;
+}
+
+/* =============================================
+   FOCUS RING GLOBAL — ACCESSIBILITÉ (Or)
+   ============================================= */
+:focus-visible {
+  outline: 2px solid #C9A035;
+  outline-offset: 2px;
+}
+
+/* =============================================
+   SELECTION COULEUR ACCENT (Or)
+   ============================================= */
+::selection {
+  background-color: rgba(201, 160, 53, 0.18);
+  color: #1C2B4A;
+}
