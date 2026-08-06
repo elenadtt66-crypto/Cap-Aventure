@@ -254,7 +254,9 @@ export async function getClients(): Promise<Client[]> {
 
 // ==========================================
 // DONNÉES DE DÉMO (MOCK STYLE YESCAPA)
-// ======================================export const MOCK_VEHICLES: Vehicle[] = [
+// ==========================================
+
+export const MOCK_VEHICLES: Vehicle[] = [
   {
     id: 'van-1',
     slug: 'volkswagen-california-coast-t6',
@@ -405,7 +407,7 @@ export async function getClients(): Promise<Client[]> {
     id: 'cc-capucine-1',
     slug: 'benimar-sport-340',
     name: 'Benimar Sport 340 Up',
-    type: 'capucine',
+    type: 'camping_car_profile',
     description: 'Le camping-car familial par excellence avec ses 5 places carte grise et couchages sans aucune manipulation ! Un grand lit capucine au-dessus de la cabine, des lits superposés à l\'arrière pour les enfants, et un salon spacieux. Tout est inclus et prêt à partir (vaisselle, cales, tuyau, rallonge).',
     pricePerDay: 130,
     seats: 5,
@@ -429,7 +431,7 @@ export async function getClients(): Promise<Client[]> {
     slug: 'mercedes-marco-polo',
     name: 'Mercedes Marco Polo AMG Line',
     type: 'van_amenege',
-    description: 'Le luxe absolu en format van. Finitions intérieures premium inspirées des yachts, sièges en cuir véritable, ambiance lumineuse réglable, suspension pneumatique pour un confort de route inégalé. Toit relevable électriquement, système multimédia MBUX. L\'élégance et l'aventure réunies.',
+    description: 'Le luxe absolu en format van. Finitions intérieures premium inspirées des yachts, sièges en cuir véritable, ambiance lumineuse réglable, suspension pneumatique pour un confort de route inégalé. Toit relevable électriquement, système multimédia MBUX. L\'élégance et l\'aventure réunies.',
     pricePerDay: 160,
     seats: 4,
     beds: 4,
@@ -492,8 +494,5 @@ export async function getClients(): Promise<Client[]> {
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.5L/100km', enginePower: '177 ch' },
     rating: 4.9, reviewCount: 12,
     reviews: [{ id: 'rev-11', author: 'Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
-  }
-];
-Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
   }
 ];
