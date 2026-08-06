@@ -562,21 +562,22 @@ export default function HomePage() {
             {/* Card 1: Bruges */}
             <button 
               onClick={() => router.push('/vehicules?location=Bruges')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=800&q=80" 
                 alt="Bruges"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇧🇪
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">Belgique</p>
-                  <p className="text-sm font-extrabold">Bruges</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Bruges</p>
                 </div>
               </div>
             </button>
@@ -584,21 +585,22 @@ export default function HomePage() {
             {/* Card 2: Mont Blanc */}
             <button 
               onClick={() => router.push('/vehicules?location=Chamonix')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" 
                 alt="Mont Blanc"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇫🇷
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">France</p>
-                  <p className="text-sm font-extrabold">Mont Blanc</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Mont Blanc</p>
                 </div>
               </div>
             </button>
@@ -606,44 +608,46 @@ export default function HomePage() {
             {/* Card 3: Dinant (Tall Portrait) */}
             <button 
               onClick={() => router.push('/vehicules?location=Dinant')}
-              className="md:col-span-1 md:row-span-2 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-2 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1470071131384-001b85755b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=800&q=80" 
+                src="https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80" 
                 alt="Dinant"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-              <span className="absolute top-4 right-4 bg-[#C9A035] text-white px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Nouveau</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              <span className="absolute top-4 right-4 bg-[#C9A035] text-white px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide shadow">Nouveau</span>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇧🇪
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">Belgique</p>
-                  <p className="text-sm font-extrabold">Dinant</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Dinant</p>
                 </div>
               </div>
             </button>
 
-            {/* Card 4: Châteaux de la Loire */}
+            {/* Card 4: Val de Loire */}
             <button 
               onClick={() => router.push('/vehicules?location=Loire')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Loire"
+                src="https://images.unsplash.com/photo-1584646098378-0874589d76b1?auto=format&fit=crop&w=800&q=80" 
+                alt="Val de Loire"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇫🇷
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">France</p>
-                  <p className="text-sm font-extrabold">Val de Loire</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Val de Loire</p>
                 </div>
               </div>
             </button>
@@ -651,21 +655,22 @@ export default function HomePage() {
             {/* Card 5: Gorges du Verdon (Wide Landscape) */}
             <button 
               onClick={() => router.push('/vehicules?location=Verdon')}
-              className="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-2 md:row-span-2 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1506744626753-edaeb5d8c57a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80" 
-                alt="Verdon"
+                src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80" 
+                alt="Gorges du Verdon"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇫🇷
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">France</p>
-                  <p className="text-sm font-extrabold">Gorges du Verdon</p>
+                  <p className="text-base md:text-lg font-extrabold text-white drop-shadow-sm">Gorges du Verdon</p>
                 </div>
               </div>
             </button>
@@ -673,21 +678,22 @@ export default function HomePage() {
             {/* Card 6: Étretat */}
             <button 
               onClick={() => router.push('/vehicules?location=Etretat')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" 
                 alt="Étretat"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇫🇷
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">France</p>
-                  <p className="text-sm font-extrabold">Étretat</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Étretat</p>
                 </div>
               </div>
             </button>
@@ -695,21 +701,22 @@ export default function HomePage() {
             {/* Card 7: Les Ardennes */}
             <button 
               onClick={() => router.push('/vehicules?location=Ardennes')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80" 
                 alt="Ardennes"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇧🇪
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">Belgique</p>
-                  <p className="text-sm font-extrabold">Les Ardennes</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Les Ardennes</p>
                 </div>
               </div>
             </button>
@@ -717,21 +724,22 @@ export default function HomePage() {
             {/* Card 8: Bruxelles */}
             <button 
               onClick={() => router.push('/vehicules?location=Bruxelles')}
-              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer"
+              className="md:col-span-1 md:row-span-1 group relative rounded-3xl overflow-hidden border border-brand-border hover-lift shadow-sm cursor-pointer bg-brand-navy/10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1421091255823-f4530d1720d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=800&q=80" 
                 alt="Bruxelles"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 text-white flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-sm shadow">
                   🇧🇪
                 </div>
                 <div className="text-left leading-none">
                   <p className="text-xs font-bold font-mono text-[#FEF08A]">Belgique</p>
-                  <p className="text-sm font-extrabold">Bruxelles</p>
+                  <p className="text-sm font-extrabold text-white drop-shadow-sm">Bruxelles</p>
                 </div>
               </div>
             </button>
