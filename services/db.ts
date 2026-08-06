@@ -24,7 +24,7 @@ import yescapaData from '@/data/yescapa-vehicles.json';
 export async function getVehicles(): Promise<Vehicle[]> {
   try {
     if (db.app.options.projectId === 'mock-project-id') {
-      return [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+      return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
     }
     const q = query(collection(db, 'vehicles'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
@@ -63,19 +63,19 @@ export async function getVehicles(): Promise<Vehicle[]> {
     });
     
     if (list.length === 0) {
-      return [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+      return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
     }
     return list;
   } catch (error) {
     console.error('Error fetching vehicles:', error);
-    return [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+    return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
   }
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   try {
     if (db.app.options.projectId === 'mock-project-id') {
-      const allMocks = [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+      const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
       return allMocks.find(v => v.slug === slug) || null;
     }
     const q = query(collection(db, 'vehicles'), where('slug', '==', slug));
@@ -114,12 +114,12 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
       };
     }
     
-    const allMocks = [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+    const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
     const mockFound = allMocks.find(v => v.slug === slug);
     return mockFound || null;
   } catch (error) {
     console.error('Error fetching vehicle by slug:', error);
-    const allMocks = [...MOCK_VEHICLES, ...(yescapaData as Vehicle[])];
+    const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
     const mockFound = allMocks.find(v => v.slug === slug);
     return mockFound || null;
   }
