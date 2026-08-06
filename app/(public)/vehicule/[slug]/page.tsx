@@ -12,6 +12,7 @@ import {
   Calendar,
   Layers,
   ChevronRight,
+  ChevronLeft,
   Info,
   CheckCircle2,
   RefreshCw,
@@ -20,7 +21,10 @@ import {
   Fuel,
   Cpu,
   Gauge,
-  Workflow
+  Workflow,
+  X,
+  Maximize2,
+  Camera
 } from 'lucide-react';
 import { getVehicleBySlug } from '@/services/db';
 import { Vehicle } from '@/types';
@@ -35,6 +39,10 @@ export default function VehicleDetailPage({ params }: PageProps) {
   
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Lightbox Modal state
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // Widget réservation local states
   const [startDate, setStartDate] = useState('');
@@ -55,6 +63,55 @@ export default function VehicleDetailPage({ params }: PageProps) {
     loadVehicle();
   }, [slug]);
 
+  // Galerie complète filtrée et enrichie
+  const galleryImages = React.useMemo(() => {
+    if (!vehicle) return [];
+    
+    const typeFallbacks: Record<string, string[]> = {
+      van_amenege: ['/images/vehicles/van_1.png', '/images/vehicles/van_2.png', '/images/vehicles/van_3.png'],
+      fourgon_amenege: ['/images/vehicles/fourgon_1.png', '/images/vehicles/fourgon_2.png', '/images/vehicles/fourgon_3.png'],
+      camping_car_profile: ['/images/vehicles/profile_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png'],
+      camping_car_integral: ['/images/vehicles/integral_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png'],
+      capucine: ['/images/vehicles/capucine_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png']
+    };
+
+    const genericInteriors = [
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
+    ];
+
+    let imgs = (vehicle.images || []).filter(
+      img => img && !img.includes('photo-1470071131384') && !img.includes('photo-1513311068348')
+    );
+    
+    if (imgs.length === 0) {
+      imgs = typeFallbacks[vehicle.type] || typeFallbacks.van_amenege;
+    }
+
+    const pool = [...(typeFallbacks[vehicle.type] || []), ...genericInteriors];
+    for (const fallback of pool) {
+      if (imgs.length >= 4) break;
+      if (!imgs.includes(fallback)) {
+        imgs.push(fallback);
+      }
+    }
+
+    return imgs;
+  }, [vehicle]);
+
+  // Navigation au clavier dans la modale
+  useEffect(() => {
+    if (!isGalleryOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsGalleryOpen(false);
+      if (e.key === 'ArrowRight') setActiveImageIndex(prev => (prev + 1) % galleryImages.length);
+      if (e.key === 'ArrowLeft') setActiveImageIndex(prev => (prev - 1 + galleryImages.length) % galleryImages.length);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isGalleryOpen, galleryImages.length]);
+
   // Calcul de la décomposition des prix
   const totalDays = React.useMemo(() => {
     if (!startDate || !endDate) return 0;
@@ -69,11 +126,6 @@ export default function VehicleDetailPage({ params }: PageProps) {
     if (!vehicle || totalDays <= 0) return { owner: 0, service: 0, insurance: 0, total: 0 };
     
     const grossTotal = totalDays * vehicle.pricePerDay;
-    
-    // Décomposition de type Yescapa :
-    // - 75% rémunération propriétaire
-    // - 15% frais de service plateforme
-    // - 10% frais d'assurance tous risques
     const owner = Math.round(grossTotal * 0.75);
     const service = Math.round(grossTotal * 0.15);
     const insurance = Math.round(grossTotal * 0.10);
@@ -140,6 +192,8 @@ export default function VehicleDetailPage({ params }: PageProps) {
     fourgon_amenege: 'Fourgon Aménagé'
   };
 
+  const imageCaptions = ['Vue extérieure', 'Espace Salon', 'Espace Nuit', 'Cuisine & Équipements'];
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 w-full space-y-8">
       {/* 1. Header Navigation & Title */}
@@ -181,50 +235,142 @@ export default function VehicleDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* 2. Airbnb/Yescapa style Photo Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 h-[400px] rounded-3xl overflow-hidden shadow-sm border border-brand-border group">
+      {/* 2. Enhanced Photo Gallery Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 h-[420px] rounded-3xl overflow-hidden shadow-md border border-brand-border bg-white relative group">
         {/* Large left photo */}
-        <div className="md:col-span-2 relative h-full bg-brand-hover overflow-hidden">
+        <div 
+          onClick={() => { setActiveImageIndex(0); setIsGalleryOpen(true); }}
+          className="md:col-span-2 relative h-full bg-brand-navy/5 overflow-hidden cursor-pointer group/img"
+        >
           <img 
-            src={vehicle.images[0]} 
+            src={galleryImages[0]} 
             alt={vehicle.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+            className="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500"
           />
+          <div className="absolute top-4 left-4 bg-brand-navy/80 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 shadow-sm">
+            <Camera className="w-3.5 h-3.5 text-brand-gold" />
+            <span>Vue principale</span>
+          </div>
         </div>
         
         {/* Right side 3-image grid */}
         <div className="hidden md:grid md:col-span-2 grid-cols-2 grid-rows-2 gap-3 h-full">
           {/* Top Left */}
-          <div className="relative bg-brand-hover overflow-hidden">
+          <div 
+            onClick={() => { setActiveImageIndex(1); setIsGalleryOpen(true); }}
+            className="relative bg-brand-navy/5 overflow-hidden cursor-pointer group/img"
+          >
             <img 
-              src={vehicle.images[1] || vehicle.images[0]} 
-              alt="Intérieur Salon"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+              src={galleryImages[1] || galleryImages[0]} 
+              alt="Salon"
+              className="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500"
             />
+            <span className="absolute bottom-3 left-3 bg-brand-navy/75 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-md">
+              {imageCaptions[1]}
+            </span>
           </div>
           {/* Top Right */}
-          <div className="relative bg-brand-hover overflow-hidden">
+          <div 
+            onClick={() => { setActiveImageIndex(2); setIsGalleryOpen(true); }}
+            className="relative bg-brand-hover overflow-hidden cursor-pointer group/img"
+          >
             <img 
-              src={vehicle.images[2] || vehicle.images[0]} 
-              alt="Espace Nuit"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+              src={galleryImages[2] || galleryImages[0]} 
+              alt="Couchage"
+              className="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500"
             />
+            <span className="absolute bottom-3 left-3 bg-brand-navy/75 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-md">
+              {imageCaptions[2]}
+            </span>
           </div>
           {/* Bottom Left (spans 2 cols to fill) */}
-          <div className="relative bg-brand-hover overflow-hidden col-span-2">
+          <div 
+            onClick={() => { setActiveImageIndex(3); setIsGalleryOpen(true); }}
+            className="relative bg-brand-hover overflow-hidden col-span-2 cursor-pointer group/img"
+          >
             <img 
-              src={vehicle.images[3] || vehicle.images[0]} 
-              alt="Espace Cuisine"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+              src={galleryImages[3] || galleryImages[0]} 
+              alt="Cuisine"
+              className="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors cursor-pointer flex items-end justify-end p-4">
-              <span className="px-4 py-2 bg-white/90 backdrop-blur-sm rounded-xl text-xs font-bold text-brand-text shadow-sm hover:scale-[1.02] transition-transform">
-                Voir toutes les photos
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent flex items-end justify-between p-4">
+              <span className="text-white text-xs font-semibold drop-shadow">
+                {imageCaptions[3]}
               </span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setActiveImageIndex(0); setIsGalleryOpen(true); }}
+                className="px-4 py-2 bg-white/95 backdrop-blur-md text-brand-navy rounded-xl text-xs font-extrabold shadow-lg hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center space-x-2 btn-transition"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Voir les {galleryImages.length} photos HD</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* LIGHTBOX MODAL FULLSCREEN */}
+      {isGalleryOpen && (
+        <div className="fixed inset-0 z-50 bg-brand-navy/95 backdrop-blur-xl flex flex-col justify-between p-4 md:p-8 animate-fade-in">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between text-white max-w-7xl mx-auto w-full">
+            <div>
+              <h2 className="text-lg font-bold text-white">{vehicle.name}</h2>
+              <p className="text-xs text-white/70">Photo {activeImageIndex + 1} sur {galleryImages.length} — {imageCaptions[activeImageIndex] || 'Intérieur'}</p>
+            </div>
+            <button 
+              onClick={() => setIsGalleryOpen(false)}
+              className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Main HD Image Display */}
+          <div className="relative flex-1 flex items-center justify-center my-4 max-w-6xl mx-auto w-full">
+            {/* Prev Button */}
+            <button 
+              onClick={() => setActiveImageIndex((activeImageIndex - 1 + galleryImages.length) % galleryImages.length)}
+              className="absolute left-2 md:left-6 z-10 p-3 bg-black/40 hover:bg-brand-gold hover:text-brand-navy rounded-full text-white backdrop-blur-md transition-all shadow-xl"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+
+            {/* Image display */}
+            <div className="w-full h-full max-h-[70vh] flex items-center justify-center p-2">
+              <img 
+                src={galleryImages[activeImageIndex]} 
+                alt={`${vehicle.name} photo ${activeImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-scale-up"
+              />
+            </div>
+
+            {/* Next Button */}
+            <button 
+              onClick={() => setActiveImageIndex((activeImageIndex + 1) % galleryImages.length)}
+              className="absolute right-2 md:right-6 z-10 p-3 bg-black/40 hover:bg-brand-gold hover:text-brand-navy rounded-full text-white backdrop-blur-md transition-all shadow-xl"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Thumbnail Bar */}
+          <div className="flex justify-center space-x-3 overflow-x-auto py-2 max-w-4xl mx-auto w-full">
+            {galleryImages.map((img, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveImageIndex(idx)}
+                className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+                  activeImageIndex === idx ? 'border-brand-gold scale-105 ring-2 ring-brand-gold/50' : 'border-transparent opacity-60 hover:opacity-100'
+                }`}
+              >
+                <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {/* 3. Main layout: Info column (2/3) & Booking column (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start pt-6">

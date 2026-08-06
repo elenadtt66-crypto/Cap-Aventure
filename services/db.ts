@@ -254,9 +254,7 @@ export async function getClients(): Promise<Client[]> {
 
 // ==========================================
 // DONNÉES DE DÉMO (MOCK STYLE YESCAPA)
-// ==========================================
-
-export const MOCK_VEHICLES: Vehicle[] = [
+// ======================================export const MOCK_VEHICLES: Vehicle[] = [
   {
     id: 'van-1',
     slug: 'volkswagen-california-coast-t6',
@@ -268,15 +266,16 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 4,
     features: ['Cuisine intégrée', 'Réfrigérateur 42L', 'Toit Relevable Électrique', 'Chauffage stationnaire diesel', 'Douchette extérieure', 'Régulateur de vitesse', 'Apple CarPlay', 'Table de camping extérieure'],
     images: [
-      'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1533827432537-70133748f5c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/van_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Bordeaux',
     owner: {
       name: 'Marc',
-      avatar: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
+      avatar: 'https://i.pravatar.cc/150?u=MarcVan1',
       responseTime: 'En moins d\'une heure',
       responseRate: 98
     },
@@ -298,13 +297,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 4,
     features: ['Cuisine Équipée 3 feux', 'Grand Réfrigérateur 167L', 'Douche Séparée', 'Lit Pavillon Électrique', 'Porte-Vélos x3', 'Store extérieur', 'Chauffage sur carburant'],
     images: [
-      'https://images.unsplash.com/photo-1470071131384-001b85755b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/profile_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Paris',
-    owner: { name: 'Estelle', avatar: 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En 2 heures', responseRate: 95 },
+    owner: { name: 'Estelle', avatar: 'https://i.pravatar.cc/150?u=EstelleCC1', responseTime: 'En 2 heures', responseRate: 95 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.2L/100km', enginePower: '170 ch' },
     rating: 4.8, reviewCount: 9,
     reviews: [{ id: 'rev-3', author: 'Julien M.', date: '2026-04-20', rating: 5, comment: 'Camping-car d\'un confort exceptionnel. Le salon est gigantesque !' }]
@@ -320,12 +320,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 5,
     features: ['Chauffage Central Alde', 'Double Plancher isolé', 'Four à Gaz intégré', 'Douche Indépendante Deluxe', 'Caméra de Recul 360°', 'Panneaux solaires 200W', 'Climatisation cellule', 'TV 32 pouces'],
     images: [
-      'https://images.unsplash.com/photo-1533827432537-70133748f5c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/integral_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Lyon',
-    owner: { name: 'Jean-Pierre', avatar: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En moins de 12 heures', responseRate: 90 },
+    owner: { name: 'Jean-Pierre', avatar: 'https://i.pravatar.cc/150?u=JPIntegral1', responseTime: 'En moins de 12 heures', responseRate: 90 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '11.5L/100km', enginePower: '180 ch' },
     rating: 5.0, reviewCount: 5,
     reviews: [{ id: 'rev-4', author: 'Guillaume P.', date: '2026-05-30', rating: 5, comment: 'Le grand luxe ! Ce Hymer est un véritable palace roulant.' }]
@@ -341,12 +343,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 4,
     features: ['Cabinet de Toilette Duplex', 'Toit Relevable avec couchage', 'Soute Sportive Modulaire', 'Panneau Solaire 120W', 'Porte-Vélos pivotant', 'Store extérieur', 'GPS spécial camping-car'],
     images: [
-      'https://images.unsplash.com/photo-1470071131384-001b85755b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/fourgon_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Toulouse',
-    owner: { name: 'Adrien', avatar: 'https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En 1 heure', responseRate: 100 },
+    owner: { name: 'Adrien', avatar: 'https://i.pravatar.cc/150?u=AdrienFourgon1', responseTime: 'En 1 heure', responseRate: 100 },
     techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '8.4L/100km', enginePower: '140 ch' },
     rating: 4.7, reviewCount: 11,
     reviews: [{ id: 'rev-5', author: 'Lucie D.', date: '2026-06-10', rating: 4.5, comment: 'Parfait pour notre séjour de surf dans les Landes. La soute est très grande.' }]
@@ -362,12 +366,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 4,
     features: ['WC fixes avec lavabo', 'Cuisine en L arrière', 'Toit relevable', 'Douchette extérieure', 'Chauffage stationnaire', 'Boîte automatique', 'Radars AV/AR'],
     images: [
-      'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1533827432537-70133748f5c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/van_2.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Marseille',
-    owner: { name: 'Chloé', avatar: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En 3 heures', responseRate: 92 },
+    owner: { name: 'Chloé', avatar: 'https://i.pravatar.cc/150?u=ChloeVan2', responseTime: 'En 3 heures', responseRate: 92 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '8.0L/100km', enginePower: '185 ch' },
     rating: 4.6, reviewCount: 8,
     reviews: [{ id: 'rev-6', author: 'Antoine R.', date: '2026-07-01', rating: 5, comment: 'Super van, le WC intégré est un vrai plus !' }]
@@ -383,12 +389,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 3,
     features: ['Lits Jumeaux arrières', 'Skyroof Panoramique', 'Salle de bain pivotante', 'Réfrigérateur à compression', 'Batterie Lithium', 'Attelage', 'Stores occultants cabine'],
     images: [
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1470071131384-001b85755b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/fourgon_2.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Nantes',
-    owner: { name: 'Bernard', avatar: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En moins d\'une heure', responseRate: 100 },
+    owner: { name: 'Bernard', avatar: 'https://i.pravatar.cc/150?u=BernardFourgon2', responseTime: 'En moins d\'une heure', responseRate: 100 },
     techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '9.0L/100km', enginePower: '160 ch' },
     rating: 4.9, reviewCount: 22,
     reviews: [{ id: 'rev-7', author: 'Martine V.', date: '2026-06-25', rating: 5, comment: 'Bernard est très soigneux et son fourgon est dans un état irréprochable. Le skyroof change tout.' }]
@@ -404,12 +412,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 5,
     features: ['Lits Superposés', 'Grand Lit Capucine', 'Soute modulable', 'Grand Réfrigérateur/Congélateur', 'Store Extérieur', 'Panneau Solaire', 'Porte-vélos x4'],
     images: [
-      'https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/capucine_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Rennes',
-    owner: { name: 'Famille Dupont', avatar: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En 4 heures', responseRate: 88 },
+    owner: { name: 'Famille Dupont', avatar: 'https://i.pravatar.cc/150?u=DupontCapucine1', responseTime: 'En 4 heures', responseRate: 88 },
     techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '10.5L/100km', enginePower: '130 ch' },
     rating: 4.5, reviewCount: 15,
     reviews: [{ id: 'rev-8', author: 'Pauline C.', date: '2026-05-10', rating: 4, comment: 'Véhicule très pratique pour notre famille de 5, les enfants ont adoré les lits superposés.' }]
@@ -419,18 +429,20 @@ export const MOCK_VEHICLES: Vehicle[] = [
     slug: 'mercedes-marco-polo',
     name: 'Mercedes Marco Polo AMG Line',
     type: 'van_amenege',
-    description: 'Le luxe absolu en format van. Finitions intérieures premium inspirées des yachts, sièges en cuir véritable, ambiance lumineuse réglable, suspension pneumatique pour un confort de route inégalé. Toit relevable électriquement, système multimédia MBUX. L\'élégance et l\'aventure réunies.',
+    description: 'Le luxe absolu en format van. Finitions intérieures premium inspirées des yachts, sièges en cuir véritable, ambiance lumineuse réglable, suspension pneumatique pour un confort de route inégalé. Toit relevable électriquement, système multimédia MBUX. L\'élégance et l'aventure réunies.',
     pricePerDay: 160,
     seats: 4,
     beds: 4,
     features: ['Finition AMG Line', 'Intérieur Cuir', 'Système Son Burmester', 'Suspension Airmatic', 'Caméras 360', 'Cuisine Premium', 'Chauffage stationnaire'],
     images: [
-      'https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/van_3.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Nice',
-    owner: { name: 'Alexandre', avatar: 'https://images.unsplash.com/photo-1470071131384-001b85755b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En moins d\'une heure', responseRate: 100 },
+    owner: { name: 'Alexandre', avatar: 'https://i.pravatar.cc/150?u=AlexandreVan3', responseTime: 'En moins d\'une heure', responseRate: 100 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '7.8L/100km', enginePower: '239 ch' },
     rating: 5.0, reviewCount: 6,
     reviews: [{ id: 'rev-9', author: 'Stéphane G.', date: '2026-06-15', rating: 5, comment: 'Un van hors norme. Le moteur V300d est puissant et silencieux, l\'intérieur est magique. Alexandre est très arrangeant.' }]
@@ -446,12 +458,14 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 4,
     features: ['Lit Central King Size', 'Douche Indépendante', 'TV connectée 24"', 'Antenne Satellite', 'Store et panneau solaire', 'Tiroir extérieur', 'Onduleur 2000W'],
     images: [
-      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/integral_1.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Strasbourg',
-    owner: { name: 'Sylvie', avatar: 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En 2 heures', responseRate: 94 },
+    owner: { name: 'Sylvie', avatar: 'https://i.pravatar.cc/150?u=SylvieCC2', responseTime: 'En 2 heures', responseRate: 94 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '10.2L/100km', enginePower: '160 ch' },
     rating: 4.8, reviewCount: 18,
     reviews: [{ id: 'rev-10', author: 'Laurent K.', date: '2026-05-02', rating: 5, comment: 'Le véhicule idéal pour notre escapade en Forêt Noire. Le confort thermique est excellent même par temps froid.' }]
@@ -467,14 +481,19 @@ export const MOCK_VEHICLES: Vehicle[] = [
     beds: 2,
     features: ['Salle d\'eau complète', 'Lit transversal spacieux', 'Chauffage Gaz/Électricité', 'Panneau de contrôle tactile', 'Éclairage d\'ambiance LED', 'Mobilier blanc brillant', 'Table + chaises intégrées aux portes'],
     images: [
-      'https://images.unsplash.com/photo-1533827432537-70133748f5c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      '/images/vehicles/fourgon_3.png',
+      '/images/vehicles/living_interior.png',
+      '/images/vehicles/bed_interior.png',
+      '/images/vehicles/kitchen_interior.png'
     ],
     available: true,
     location: 'Biarritz',
-    owner: { name: 'Maxime', avatar: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80', responseTime: 'En moins de 30 minutes', responseRate: 100 },
+    owner: { name: 'Maxime', avatar: 'https://i.pravatar.cc/150?u=MaximeFourgon3', responseTime: 'En moins de 30 minutes', responseRate: 100 },
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.5L/100km', enginePower: '177 ch' },
     rating: 4.9, reviewCount: 12,
     reviews: [{ id: 'rev-11', author: 'Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
+  }
+];
+Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
   }
 ];
