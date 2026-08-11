@@ -105,7 +105,8 @@ function VehiclesContent() {
     van_amenege: 'Van Aménagé',
     camping_car_profile: 'Camping-car Profilé',
     camping_car_integral: 'Camping-car Intégral',
-    fourgon_amenege: 'Fourgon Aménagé'
+    fourgon_amenege: 'Fourgon Aménagé',
+    caravane: 'Caravane'
   };
 
   return (
@@ -150,6 +151,7 @@ function VehiclesContent() {
               { value: 'Paris', label: 'Paris', icon: '🇫🇷' },
               { value: 'Lyon', label: 'Lyon', icon: '🇫🇷' },
               { value: 'Toulouse', label: 'Toulouse', icon: '🇫🇷' },
+              { value: 'Norvège', label: 'Norvège', icon: '🇳🇴' },
             ]}
           />
 
@@ -164,6 +166,7 @@ function VehiclesContent() {
               { value: 'camping_car_profile', label: 'Camping-car Profilé', icon: '🚌' },
               { value: 'camping_car_integral', label: 'Camping-car Intégral', icon: '🚘' },
               { value: 'fourgon_amenege', label: 'Fourgon Aménagé', icon: '📦' },
+              { value: 'caravane', label: 'Caravane', icon: '🏕️' },
             ]}
           />
 

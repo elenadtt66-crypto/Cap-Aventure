@@ -100,6 +100,7 @@ export default function AdminCalendar() {
     camping_car_profile: '#16A34A',
     camping_car_integral: '#2563EB',
     fourgon_amenege: '#8B5CF6',
+    caravane: '#CA8A04',
   };
 
   // Stats rapides

@@ -332,6 +332,7 @@ export default function ProprietairePage() {
                         <option value="camping_car_profile">Camping-car Profilé</option>
                         <option value="camping_car_integral">Camping-car Intégral</option>
                         <option value="fourgon_amenege">Fourgon Aménagé</option>
+                        <option value="caravane">Caravane</option>
                       </select>
                     </div>
 

@@ -12,7 +12,7 @@ interface AnimatedSectionProps {
   delay?: number;        // ms
   duration?: number;     // ms
   threshold?: number;
-  as?: keyof JSX.IntrinsicElements;
+  as?: keyof React.JSX.IntrinsicElements;
 }
 
 const variants: Record<AnimationVariant, { from: string; to: string }> = {

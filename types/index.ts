@@ -1,4 +1,4 @@
-export type VehicleType = 'van_amenege' | 'camping_car_profile' | 'camping_car_integral' | 'fourgon_amenege';
+export type VehicleType = 'van_amenege' | 'camping_car_profile' | 'camping_car_integral' | 'fourgon_amenege' | 'caravane';
 
 export interface Owner {
   name: string;
@@ -16,8 +16,8 @@ export interface Review {
 }
 
 export interface TechSpecs {
-  fuel: 'Diesel' | 'Essence' | 'Hybride' | 'Électrique';
-  transmission: 'Manuelle' | 'Automatique';
+  fuel: 'Diesel' | 'Essence' | 'Hybride' | 'Électrique' | 'Aucun';
+  transmission: 'Manuelle' | 'Automatique' | 'Aucune';
   consumption: string;
   enginePower: string;
 }

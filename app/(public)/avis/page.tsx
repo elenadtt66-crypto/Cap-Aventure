@@ -131,7 +131,8 @@ export default function AvisPage() {
       'van_amenege': 'Van Aménagé • Volkswagen California',
       'camping_car_profile': 'Camping-car Profilé • Challenger Graphite',
       'camping_car_integral': 'Camping-car Intégral • Rapido Premium',
-      'fourgon_amenege': 'Fourgon Aménagé • Peugeot Boxer'
+      'fourgon_amenege': 'Fourgon Aménagé • Peugeot Boxer',
+      'caravane': 'Caravane • Adria Alpina'
     };
 
     const newReview: Review = {
@@ -519,6 +520,7 @@ export default function AvisPage() {
                       <option value="camping_car_profile">Camping-car Profilé</option>
                       <option value="camping_car_integral">Camping-car Intégral</option>
                       <option value="fourgon_amenege">Fourgon Aménagé</option>
+                      <option value="caravane">Caravane</option>
                     </select>
                     <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted pointer-events-none" />
                   </div>

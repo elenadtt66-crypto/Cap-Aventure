@@ -212,7 +212,8 @@ export default function AdminVehicles() {
     van_amenege: 'Van Aménagé',
     camping_car_profile: 'Camping-car Profilé',
     camping_car_integral: 'Camping-car Intégral',
-    fourgon_amenege: 'Fourgon Aménagé'
+    fourgon_amenege: 'Fourgon Aménagé',
+    caravane: 'Caravane'
   };
 
   return (
@@ -305,6 +306,7 @@ export default function AdminVehicles() {
                     <option value="camping_car_profile">Camping-car Profilé</option>
                     <option value="camping_car_integral">Camping-car Intégral</option>
                     <option value="fourgon_amenege">Fourgon Aménagé</option>
+                    <option value="caravane">Caravane</option>
                   </select>
                 </div>
 
@@ -459,6 +461,7 @@ export default function AdminVehicles() {
             <option value="camping_car_profile">Camping-cars Profilés</option>
             <option value="camping_car_integral">Camping-cars Intégraux</option>
             <option value="fourgon_amenege">Fourgons Aménagés</option>
+            <option value="caravane">Caravanes</option>
           </select>
         </div>
       </div>

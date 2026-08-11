@@ -507,5 +507,100 @@ export const MOCK_VEHICLES: Vehicle[] = [
     techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.5L/100km', enginePower: '177 ch' },
     rating: 4.9, reviewCount: 12,
     reviews: [{ id: 'rev-11', author: 'Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
+  },
+  {
+    id: 'caravane-adria-1',
+    slug: 'adria-alpina-573up-2018',
+    name: 'Adria Alpina 573UP',
+    type: 'caravane',
+    description: 'Adria alpina 573up, modèle 2018.\nLa caravane a peu servi et est en excellent état. Aucun animal n\'y a jamais été transporté et il n\'y a jamais eu de fumée.\n\nÉquipement supplémentaire inclus :\n- Auvent Fiamma zip XL avec 3 parois\n- AL-KO déplaceur (mover)\n- Panneau solaire\n- Surmatelas sur mesure pour lit double\n- Téléviseur Finlux 24 pouces\n\nCaravane bien équipée : Aldevarme 3020HE avec chauffage au sol à eau pour un chauffage uniforme et confortable, four, micro-ondes, trappe à skis, trappe de chargement, Bluetooth, alarme à gaz nx1, détecteur de fumée, 1 bouteille de gaz. Protège-matelas posé sur le surmatelas sur mesure. Tapis de sol et coussins décoratifs Adria d\'origine. Possibilité d\'ajouter du matériel supplémentaire. Pneus neufs en 2024. Batterie neuve de 115 Ah en 2025. Entretien du véhicule, contrôle du niveau d\'essence et de l\'humidité en 2025. Nouveau test d\'humidité effectué le 26 juin.',
+    pricePerDay: 110,
+    seats: 4,
+    beds: 4,
+    features: [
+      'Auvent Fiamma zip XL',
+      'AL-KO déplaceur',
+      'Panneau solaire',
+      'Surmatelas sur mesure',
+      'Téléviseur Finlux 24"',
+      'Chauffage au sol à eau Alde',
+      'Four & Micro-ondes',
+      'Alarme gaz nx1',
+      'Détecteur de fumée'
+    ],
+    images: [
+      '/images/vehicles/adria_1.jpg',
+      '/images/vehicles/adria_2.jpg',
+      '/images/vehicles/adria_3.jpg',
+      '/images/vehicles/adria_4.jpg',
+      '/images/vehicles/adria_5.jpg',
+      '/images/vehicles/adria_6.jpg',
+      '/images/vehicles/adria_7.jpg',
+      '/images/vehicles/adria_8.jpg',
+      '/images/vehicles/adria_9.jpg',
+      '/images/vehicles/adria_10.jpg'
+    ],
+    available: true,
+    location: 'Bordeaux',
+    owner: {
+      name: 'Mathias',
+      avatar: 'https://i.pravatar.cc/150?u=MathiasAdria',
+      responseTime: 'En moins d\'une heure',
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: 'Aucun',
+      transmission: 'Aucune',
+      consumption: 'N/A',
+      enginePower: 'N/A'
+    },
+    rating: 5.0,
+    reviewCount: 0,
+    reviews: []
+  },
+  {
+    id: 'caravane-pme-1',
+    slug: 'pme-caravane-1984',
+    name: 'Caravane Vintage PME',
+    type: 'caravane',
+    description: 'Caravane PME, modèle 1984. Propre et super simple.\n\nCaractéristiques du véhicule :\n- Longueur : 595 cm\n- Largeur : 224 cm\n- Poids total : 1 050 kg\n- Poids propre : 860 kg\n- Charge utile : 190 kg\n- Lieux de couchage : 4\n- Garée en Norvège\n\nPas de garantie ni de rapport de condition. Idéal pour une expérience de camping rétro, authentique et sans fioritures.',
+    pricePerDay: 65,
+    seats: 4,
+    beds: 4,
+    features: [
+      'Style Vintage 1984',
+      'Super simple & Propre',
+      'Longueur 5m95',
+      'Poids plume 1050kg',
+      '4 Couchages',
+      'Cabinet de toilette rétro'
+    ],
+    images: [
+      '/images/vehicles/pme_1.jpg',
+      '/images/vehicles/pme_2.jpg',
+      '/images/vehicles/pme_3.jpg',
+      '/images/vehicles/pme_4.jpg',
+      '/images/vehicles/pme_5.jpg'
+    ],
+    available: true,
+    location: 'Norvège',
+    owner: {
+      name: 'Elena',
+      avatar: 'https://i.pravatar.cc/150?u=ElenaPME',
+      responseTime: 'En moins d\'une heure',
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: 'Aucun',
+      transmission: 'Aucune',
+      consumption: 'N/A',
+      enginePower: 'N/A'
+    },
+    rating: 4.8,
+    reviewCount: 2,
+    reviews: [
+      { id: 'rev-pme-1', author: 'Lars O.', date: '2026-06-15', rating: 5, comment: 'Une caravane incroyable ! Ultra légère et facile à tracter sur les routes des fjords. Très propre.' },
+      { id: 'rev-pme-2', author: 'Astrid S.', date: '2026-07-02', rating: 4.5, comment: 'Un retour dans le temps super agréable. Couchages très confortables pour notre petite famille.' }
+    ]
   }
 ];

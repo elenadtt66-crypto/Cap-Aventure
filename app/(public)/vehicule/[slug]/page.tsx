@@ -72,7 +72,8 @@ export default function VehicleDetailPage({ params }: PageProps) {
       fourgon_amenege: ['/images/vehicles/fourgon_1.png', '/images/vehicles/fourgon_2.png', '/images/vehicles/fourgon_3.png'],
       camping_car_profile: ['/images/vehicles/profile_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png'],
       camping_car_integral: ['/images/vehicles/integral_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png'],
-      capucine: ['/images/vehicles/capucine_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png']
+      capucine: ['/images/vehicles/capucine_1.png', '/images/vehicles/living_interior.png', '/images/vehicles/bed_interior.png'],
+      caravane: ['/images/vehicles/adria_1.jpg', '/images/vehicles/adria_2.jpg', '/images/vehicles/adria_3.jpg']
     };
 
     const genericInteriors = [
@@ -189,7 +190,8 @@ export default function VehicleDetailPage({ params }: PageProps) {
     van_amenege: 'Van Aménagé',
     camping_car_profile: 'Camping-car Profilé',
     camping_car_integral: 'Camping-car Intégral',
-    fourgon_amenege: 'Fourgon Aménagé'
+    fourgon_amenege: 'Fourgon Aménagé',
+    caravane: 'Caravane'
   };
 
   const imageCaptions = ['Vue extérieure', 'Espace Salon', 'Espace Nuit', 'Cuisine & Équipements'];
