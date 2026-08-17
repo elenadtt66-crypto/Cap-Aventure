@@ -9,13 +9,18 @@ import {
   MapPin,
   Star,
   Users,
+  Bed,
   Compass,
   ArrowUpDown,
-  SlidersHorizontal
+  SlidersHorizontal,
+  ArrowRight
 } from 'lucide-react';
-import { getVehicles, MOCK_VEHICLES } from '@/services/db';
+import { getVehicles } from '@/services/db';
 import { Vehicle, VehicleType } from '@/types';
 import CustomSelect from '@/components/ui/CustomSelect';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Skeleton from '@/components/ui/Skeleton';
 
 function VehiclesContent() {
   const router = useRouter();
@@ -39,7 +44,6 @@ function VehiclesContent() {
         setVehicles(data);
       } catch (err) {
         console.error(err);
-        setVehicles(MOCK_VEHICLES);
       } finally {
         setLoading(false);
       }
@@ -65,7 +69,10 @@ function VehiclesContent() {
       result = result.filter(v => v.type === filterType);
     }
     if (filterLocation) {
-      result = result.filter(v => v.location.toLowerCase() === filterLocation.toLowerCase());
+      result = result.filter(v => 
+        v.location.toLowerCase().includes(filterLocation.toLowerCase()) ||
+        filterLocation.toLowerCase().includes(v.location.toLowerCase())
+      );
     }
     if (filterSeats) {
       result = result.filter(v => v.seats >= parseInt(filterSeats));
@@ -101,36 +108,36 @@ function VehiclesContent() {
     router.push('/vehicules');
   };
 
-  const vehicleTypeLabels: Record<string, string> = {
-    van_amenege: 'Van Aménagé',
-    camping_car_profile: 'Camping-car Profilé',
-    camping_car_integral: 'Camping-car Intégral',
-    fourgon_amenege: 'Fourgon Aménagé',
-    caravane: 'Caravane'
+  const getCategoryInfo = (type: string) => {
+    switch (type) {
+      case 'van_amenege': return { label: 'Van Aménagé', variant: 'gold' as const };
+      case 'fourgon_amenege': return { label: 'Fourgon Aménagé', variant: 'warning' as const };
+      case 'camping_car_profile': return { label: 'Camping-car Profilé', variant: 'navy' as const };
+      case 'camping_car_integral': return { label: 'Grand Intégral', variant: 'success' as const };
+      default: return { label: 'Véhicule', variant: 'neutral' as const };
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 w-full space-y-12">
+    <div className="max-w-7xl mx-auto px-6 py-12 w-full space-y-10 grain-bg">
       {/* Page Header */}
-      <div>
-        <span className="text-brand-accent font-extrabold text-xs uppercase tracking-widest block">Notre Flotte</span>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-brand-text tracking-tight mt-2">
-          Louez votre compagnon de route
+      <div className="space-y-3">
+        <Badge variant="gold">Flotte Premium Vérifiée</Badge>
+        <h1 className="text-3xl md:text-5xl font-extrabold text-brand-text tracking-tight">
+          Louez votre van ou camping-car
         </h1>
-        <p className="text-sm md:text-base text-brand-muted max-w-2xl mt-2">
-          Découvrez les véhicules de loisirs disponibles autour de vous, assurés tous risques pour votre voyage.
+        <p className="text-sm md:text-base text-brand-muted max-w-2xl">
+          Découvrez notre catalogue de {vehicles.length} modèles uniques, préparés et assurés tous risques pour votre roadtrip.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Filters Sidebar */}
-        <aside className="bg-white border border-brand-border p-6 rounded-2xl space-y-6 sticky top-28 shadow-sm">
+        <aside className="bg-white border border-brand-border p-6 rounded-3xl space-y-6 sticky top-28 shadow-sm">
           <div className="flex items-center justify-between border-b border-brand-border pb-4">
             <h3 className="font-extrabold text-brand-text flex items-center space-x-2 text-sm">
-              <svg className="w-4 h-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-              </svg>
-              <span>Filtres</span>
+              <SlidersHorizontal className="w-4 h-4 text-brand-accent" />
+              <span>Filtres de recherche</span>
             </h3>
             <button
               onClick={resetFilters}
@@ -148,10 +155,16 @@ function VehiclesContent() {
             options={[
               { value: '', label: 'Toutes les villes' },
               { value: 'Bordeaux', label: 'Bordeaux', icon: '🇫🇷' },
-              { value: 'Paris', label: 'Paris', icon: '🇫🇷' },
+              { value: 'Biarritz', label: 'Biarritz', icon: '🇫🇷' },
+              { value: 'Paris', label: 'Paris / Île-de-France', icon: '🇫🇷' },
               { value: 'Lyon', label: 'Lyon', icon: '🇫🇷' },
+              { value: 'Marseille', label: 'Marseille / Provence', icon: '🇫🇷' },
+              { value: 'Nantes', label: 'Nantes', icon: '🇫🇷' },
               { value: 'Toulouse', label: 'Toulouse', icon: '🇫🇷' },
-              { value: 'Norvège', label: 'Norvège', icon: '🇳🇴' },
+              { value: 'Nice', label: 'Nice / Côte d\'Azur', icon: '🇫🇷' },
+              { value: 'Annecy', label: 'Annecy / Alpes', icon: '🇫🇷' },
+              { value: 'Strasbourg', label: 'Strasbourg', icon: '🇫🇷' },
+              { value: 'Rennes', label: 'Rennes / Bretagne', icon: '🇫🇷' },
             ]}
           />
 
@@ -162,11 +175,10 @@ function VehiclesContent() {
             onChange={(v) => setFilterType(v)}
             options={[
               { value: '', label: 'Tous les modèles' },
-              { value: 'van_amenege', label: 'Van Aménagé', icon: '🚐' },
-              { value: 'camping_car_profile', label: 'Camping-car Profilé', icon: '🚌' },
-              { value: 'camping_car_integral', label: 'Camping-car Intégral', icon: '🚘' },
-              { value: 'fourgon_amenege', label: 'Fourgon Aménagé', icon: '📦' },
-              { value: 'caravane', label: 'Caravane', icon: '🏕️' },
+              { value: 'van_amenege', label: '🚐 Vans Aménagés (75€ - 115€)' },
+              { value: 'fourgon_amenege', label: '🚐 Fourgons Aménagés (105€ - 140€)' },
+              { value: 'camping_car_profile', label: '🚍 Profilés (135€ - 170€)' },
+              { value: 'camping_car_integral', label: '🏰 Intégraux (175€ - 245€)' },
             ]}
           />
 
@@ -177,9 +189,9 @@ function VehiclesContent() {
             onChange={(v) => setFilterSeats(v)}
             options={[
               { value: '', label: 'Indifférent' },
-              { value: '2', label: '2 places route', icon: '👥' },
-              { value: '4', label: '4 places route', icon: '👨‍👩‍👧' },
-              { value: '5', label: '5 places route', icon: '👨‍👩‍👧‍👦' },
+              { value: '2', label: '2 places route et +' },
+              { value: '4', label: '4 places route et +' },
+              { value: '5', label: '5 places route et +' },
             ]}
           />
 
@@ -190,9 +202,10 @@ function VehiclesContent() {
             onChange={(v) => setFilterBeds(v)}
             options={[
               { value: '', label: 'Indifférent' },
-              { value: '2', label: '2 couchages', icon: '🛏️' },
-              { value: '4', label: '4 couchages', icon: '🛏️' },
-              { value: '5', label: '5 couchages', icon: '🛏️' },
+              { value: '2', label: '2 couchages et +' },
+              { value: '3', label: '3 couchages et +' },
+              { value: '4', label: '4 couchages et +' },
+              { value: '5', label: '5 couchages et +' },
             ]}
           />
 
@@ -206,16 +219,16 @@ function VehiclesContent() {
             </div>
             <input
               type="range"
-              min="100"
+              min="70"
               max="300"
-              step="10"
+              step="5"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               className="w-full accent-brand-accent cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-brand-muted">
-              <span>100€</span>
-              <span>200€</span>
+            <div className="flex justify-between text-[10px] text-brand-muted font-mono">
+              <span>70€</span>
+              <span>180€</span>
               <span>300€</span>
             </div>
           </div>
@@ -224,25 +237,25 @@ function VehiclesContent() {
         {/* Vehicles Grid list */}
         <section className="lg:col-span-3 space-y-6">
           {/* Top Sort bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-brand-border p-4 rounded-xl shadow-sm text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-brand-border p-4 sm:p-5 rounded-2xl shadow-sm text-sm">
             <div className="text-brand-muted text-xs font-semibold">
-              <span className="font-extrabold text-brand-text font-mono text-sm">{filteredVehicles.length}</span> véhicule(s) trouvé(s)
+              <span className="font-extrabold text-brand-text font-mono text-sm">{filteredVehicles.length}</span> véhicule(s) disponible(s)
             </div>
             
             <div className="flex items-center space-x-3">
               <span className="flex items-center text-xs text-brand-muted font-semibold">
-                <ArrowUpDown className="w-4 h-4 mr-1.5" />
-                Trier par
+                <ArrowUpDown className="w-3.5 h-3.5 mr-1.5 text-brand-accent" />
+                Trier par :
               </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-1.5 bg-brand-beige border border-brand-border rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-xs font-semibold"
+                className="px-3.5 py-1.5 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-1 focus:ring-brand-accent text-xs font-bold text-brand-text cursor-pointer"
               >
-                <option value="price-asc">Prix : croissant</option>
-                <option value="price-desc">Prix : décroissant</option>
-                <option value="rating-desc">Mieux notés</option>
-                <option value="seats-desc">Places : max</option>
+                <option value="price-asc">Prix le plus bas d'abord</option>
+                <option value="price-desc">Prix le plus haut d'abord</option>
+                <option value="rating-desc">Meilleures notes (5★)</option>
+                <option value="seats-desc">Nombre de places max</option>
               </select>
             </div>
           </div>
@@ -250,109 +263,114 @@ function VehiclesContent() {
           {/* Catalog grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white border border-brand-border rounded-2xl p-6 space-y-4 animate-pulse">
-                  <div className="h-52 bg-brand-border/40 rounded-xl"></div>
-                  <div className="h-6 bg-brand-border/40 rounded w-3/4"></div>
-                  <div className="h-4 bg-brand-border/40 rounded w-1/2"></div>
-                </div>
-              ))}
+              <Skeleton variant="card" />
+              <Skeleton variant="card" />
+              <Skeleton variant="card" />
+              <Skeleton variant="card" />
             </div>
           ) : filteredVehicles.length === 0 ? (
-            <div className="bg-white border border-brand-border rounded-2xl p-12 text-center space-y-4">
-              <div className="w-12 h-12 bg-brand-hover rounded-full flex items-center justify-center mx-auto text-brand-muted">
+            <div className="bg-white border border-brand-border rounded-3xl p-12 text-center space-y-4 shadow-sm">
+              <div className="w-12 h-12 bg-brand-hover rounded-2xl flex items-center justify-center mx-auto text-brand-muted">
                 <Info className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-brand-text">Aucun véhicule ne correspond</h3>
+              <h3 className="text-lg font-extrabold text-brand-text">Aucun véhicule ne correspond</h3>
               <p className="text-xs text-brand-muted max-w-sm mx-auto">
-                Modifiez vos filtres ou réinitialisez la recherche pour découvrir notre flotte de camping-cars.
+                Modifiez vos filtres ou réinitialisez la recherche pour découvrir notre flotte de camping-cars et vans.
               </p>
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={resetFilters}
-                className="px-4 py-2 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-xs font-semibold shadow-sm transition-colors duration-200"
               >
                 Réinitialiser la recherche
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {filteredVehicles.map((veh) => (
-                <div 
-                  key={veh.id}
-                  className="group flex flex-col bg-white border border-brand-border rounded-2xl overflow-hidden hover-lift shadow-sm transition-all duration-300"
-                >
-                  <div className="relative h-52 overflow-hidden bg-brand-hover">
-                    <img 
-                      src={veh.images[0] || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80'} 
-                      alt={veh.name} 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    
-                    {/* Badge catégorie */}
-                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-brand-accent border border-brand-border/50">
-                      {vehicleTypeLabels[veh.type]}
-                    </div>
-
-                    {/* Propriétaire avatar */}
-                    <div className="absolute bottom-4 right-4 flex items-center space-x-2 bg-white/90 backdrop-blur-sm p-1 rounded-full border border-brand-border/40">
+              {filteredVehicles.map((veh) => {
+                const cat = getCategoryInfo(veh.type);
+                return (
+                  <div 
+                    key={veh.id}
+                    className="group flex flex-col bg-white border border-brand-border rounded-3xl overflow-hidden hover-lift shadow-sm transition-all duration-300 justify-between"
+                  >
+                    <div className="relative h-56 overflow-hidden bg-brand-hover">
                       <img 
-                        src={veh.owner.avatar} 
-                        alt={veh.owner.name} 
-                        className="w-7 h-7 rounded-full object-cover"
+                        src={veh.images[0] || 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80'} 
+                        alt={veh.name} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <span className="text-[9px] font-bold text-brand-text pr-2">{veh.owner.name}</span>
+                      
+                      {/* Badge catégorie */}
+                      <div className="absolute top-3.5 left-3.5">
+                        <Badge variant={cat.variant} size="sm">
+                          {cat.label}
+                        </Badge>
+                      </div>
+
+                      {/* Propriétaire avatar */}
+                      <div className="absolute bottom-3.5 right-3.5 flex items-center space-x-2 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full border border-brand-border/40 shadow-sm">
+                        <img 
+                          src={veh.owner.avatar} 
+                          alt={veh.owner.name} 
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                        <span className="text-[10px] font-bold text-brand-text">{veh.owner.name}</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-brand-muted font-bold flex items-center">
-                          <MapPin className="w-3.5 h-3.5 mr-1 text-brand-accent" />
-                          {veh.location}
-                        </span>
-                        
-                        {/* Notes */}
-                        <div className="flex items-center text-xs font-bold text-brand-text">
-                          <Star className="w-3.5 h-3.5 fill-[#F59E0B] text-[#F59E0B] mr-1" />
-                          <span>{veh.rating}</span>
-                          <span className="text-brand-muted font-normal ml-1">({veh.reviewCount})</span>
+                    
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-brand-muted font-bold flex items-center">
+                            <MapPin className="w-3.5 h-3.5 mr-1 text-brand-accent" />
+                            {veh.location}
+                          </span>
+                          
+                          {/* Notes */}
+                          <div className="flex items-center text-xs font-bold text-brand-text bg-brand-beige px-2 py-0.5 rounded-md">
+                            <Star className="w-3.5 h-3.5 fill-brand-accent text-brand-accent mr-1" />
+                            <span>{veh.rating.toFixed(2)}</span>
+                            <span className="text-brand-muted font-normal ml-1">({veh.reviewCount})</span>
+                          </div>
+                        </div>
+
+                        <h3 className="text-base font-extrabold text-brand-text group-hover:text-brand-accent transition-colors leading-snug">
+                          {veh.name}
+                        </h3>
+                        <p className="text-xs text-brand-muted line-clamp-2 leading-relaxed">
+                          {veh.description}
+                        </p>
+                      </div>
+
+                      {/* Caractéristiques rapides */}
+                      <div className="grid grid-cols-2 gap-2 py-3 border-y border-brand-border text-xs text-brand-text">
+                        <div className="flex items-center space-x-2 p-2 bg-brand-beige rounded-xl">
+                          <Users className="w-3.5 h-3.5 text-brand-muted" />
+                          <span className="font-semibold text-[11px]">{veh.seats} Places</span>
+                        </div>
+                        <div className="flex items-center space-x-2 p-2 bg-brand-beige rounded-xl">
+                          <Bed className="w-3.5 h-3.5 text-brand-muted" />
+                          <span className="font-semibold text-[11px]">{veh.beds} Couchages</span>
                         </div>
                       </div>
 
-                      <h3 className="text-lg font-extrabold text-brand-text">{veh.name}</h3>
-                      <p className="text-xs text-brand-muted line-clamp-2 leading-relaxed">
-                        {veh.description}
-                      </p>
-                    </div>
-
-                    {/* Caractéristiques rapides */}
-                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-brand-border text-xs text-brand-text">
-                      <div className="flex items-center space-x-2">
-                        <Users className="w-4 h-4 text-brand-accent" />
-                        <span>{veh.seats} Places Route</span>
+                      <div className="flex justify-between items-center pt-2">
+                        <div>
+                          <span className="text-2xl font-extrabold text-brand-navy font-mono">{veh.pricePerDay}€</span>
+                          <span className="text-xs text-brand-muted"> / jour</span>
+                        </div>
+                        <Link
+                          href={`/reservation?vehicle=${veh.slug || veh.id}`}
+                          className="px-5 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-xs font-bold shadow-sm btn-transition"
+                        >
+                          Réserver
+                        </Link>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Compass className="w-4 h-4 text-brand-accent" />
-                        <span>{veh.beds} Couchages</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-2">
-                      <div>
-                        <span className="text-2xl font-extrabold text-brand-text font-mono">{veh.pricePerDay}€</span>
-                        <span className="text-xs text-brand-muted"> / jour</span>
-                      </div>
-                      <Link
-                        href={`/vehicule/${veh.slug}`}
-                        className="px-4 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-xs font-bold shadow-sm btn-transition"
-                      >
-                        Détails & Réserver
-                      </Link>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

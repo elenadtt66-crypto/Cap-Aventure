@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { getVehicles, MOCK_VEHICLES } from '@/services/db';
 import { Vehicle } from '@/types';
+import DatePicker from '@/components/ui/DatePicker';
+import SelectMenu, { SelectMenuOption } from '@/components/ui/SelectMenu';
 
 export default function HomePage() {
   const router = useRouter();
@@ -148,32 +150,25 @@ export default function HomePage() {
             </div>
 
             {/* Date début */}
-            <div className="px-5 py-2.5 border-b md:border-b-0 md:border-r border-brand-border/60">
-              <label className="block text-[10px] font-extrabold uppercase text-brand-muted tracking-wider mb-1 flex items-center">
-                <Calendar className="w-3 h-3 mr-1 text-brand-accent" />
-                Début location
-              </label>
-              <input
-                type="date"
-                min={new Date().toISOString().split('T')[0]}
+            <div className="px-3 py-1 border-b md:border-b-0 md:border-r border-brand-border/60">
+              <DatePicker
+                placeholder="Début location"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-transparent text-sm font-bold text-brand-text focus:outline-none border-none p-0 cursor-pointer"
+                onChange={(val) => {
+                  setStartDate(val);
+                  if (endDate && val > endDate) setEndDate(val);
+                }}
+                minDate={new Date().toISOString().split('T')[0]}
               />
             </div>
 
             {/* Date fin */}
-            <div className="px-5 py-2.5">
-              <label className="block text-[10px] font-extrabold uppercase text-brand-muted tracking-wider mb-1 flex items-center">
-                <Calendar className="w-3 h-3 mr-1 text-brand-accent" />
-                Fin location
-              </label>
-              <input
-                type="date"
-                min={startDate || new Date().toISOString().split('T')[0]}
+            <div className="px-3 py-1">
+              <DatePicker
+                placeholder="Fin location"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-transparent text-sm font-bold text-brand-text focus:outline-none border-none p-0 cursor-pointer"
+                onChange={(val) => setEndDate(val)}
+                minDate={startDate || new Date().toISOString().split('T')[0]}
               />
             </div>
 

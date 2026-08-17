@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { getVehicleBySlug } from '@/services/db';
 import { Vehicle } from '@/types';
+import DatePicker from '@/components/ui/DatePicker';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -545,42 +546,27 @@ export default function VehicleDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
-                Date de départ
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
-                  <Calendar className="w-4 h-4" />
-                </span>
-                <input
-                  type="date"
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent text-sm"
-                />
-              </div>
-            </div>
+            <div className="space-y-4">
+              <DatePicker
+                label="Date de départ"
+                required
+                value={startDate}
+                onChange={(val) => {
+                  setStartDate(val);
+                  if (endDate && val > endDate) {
+                    setEndDate(val);
+                  }
+                }}
+                minDate={new Date().toISOString().split('T')[0]}
+              />
 
-            <div>
-              <label className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
-                Date de retour
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
-                  <Calendar className="w-4 h-4" />
-                </span>
-                <input
-                  type="date"
-                  required
-                  min={startDate || new Date().toISOString().split('T')[0]}
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent text-sm"
-                />
-              </div>
+              <DatePicker
+                label="Date de retour"
+                required
+                value={endDate}
+                onChange={(val) => setEndDate(val)}
+                minDate={startDate || new Date().toISOString().split('T')[0]}
+              />
             </div>
 
             {/* Price breakdown details (Style Yescapa) */}

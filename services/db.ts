@@ -15,16 +15,98 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Vehicle, Client, Reservation, ReservationStatus } from '@/types';
-import yescapaData from '@/data/yescapa-vehicles.json';
+import cleanVehiclesDataset from '@/data/yescapa-vehicles.json';
+
+// Dataset en mémoire pour mode démo/hors-ligne fluide
+let inMemoryVehicles: Vehicle[] = [...(cleanVehiclesDataset as Vehicle[])];
+let inMemoryReservations: Reservation[] = [
+  {
+    id: 'res-demo-01',
+    vehicleId: 'cap-van-01',
+    vehicleName: 'Volkswagen California Ocean T6.1',
+    clientId: 'cli-01',
+    clientName: 'Maxime Dupont',
+    startDate: '2026-09-01',
+    endDate: '2026-09-08',
+    totalDays: 7,
+    totalPrice: 665,
+    status: 'CONFIRMEE',
+    specificDetails: {
+      outdoorShower: true,
+      notes: 'Départ prévu à 9h'
+    }
+  },
+  {
+    id: 'res-demo-02',
+    vehicleId: 'cap-profile-01',
+    vehicleName: 'Challenger 260 Graphite Ultimate',
+    clientId: 'cli-02',
+    clientName: 'Sophie Lambert',
+    startDate: '2026-09-12',
+    endDate: '2026-09-19',
+    totalDays: 7,
+    totalPrice: 1036,
+    status: 'EN_ATTENTE',
+    specificDetails: {
+      bikeRackCount: 2,
+      notes: 'Demande de lit parapluie'
+    }
+  },
+  {
+    id: 'res-demo-03',
+    vehicleId: 'cap-integral-01',
+    vehicleName: 'Hymer B-Class MasterLine I 780',
+    clientId: 'cli-03',
+    clientName: 'Jean Valérien',
+    startDate: '2026-10-05',
+    endDate: '2026-10-15',
+    totalDays: 10,
+    totalPrice: 2350,
+    status: 'CONFIRMEE',
+    specificDetails: {
+      luxuryLinenPack: true,
+      finalCleaningService: true
+    }
+  }
+];
+
+let inMemoryClients: Client[] = [
+  {
+    id: 'cli-01',
+    firstName: 'Maxime',
+    lastName: 'Dupont',
+    email: 'maxime.dupont@email.com',
+    phone: '06 12 34 56 78',
+    drivingLicenseNumber: '12AB34567'
+  },
+  {
+    id: 'cli-02',
+    firstName: 'Sophie',
+    lastName: 'Lambert',
+    email: 'sophie.lambert@email.com',
+    phone: '06 98 76 54 32',
+    drivingLicenseNumber: '98CD76543'
+  },
+  {
+    id: 'cli-03',
+    firstName: 'Jean',
+    lastName: 'Valérien',
+    email: 'jean.valerien@email.com',
+    phone: '07 89 01 23 45',
+    drivingLicenseNumber: '45EF89012'
+  }
+];
+
+export const MOCK_VEHICLES: Vehicle[] = inMemoryVehicles;
 
 // ==========================================
-// SERVICES VÉHICILES
+// SERVICES VÉHICULES
 // ==========================================
 
 export async function getVehicles(): Promise<Vehicle[]> {
   try {
-    if (db.app.options.projectId === 'mock-project-id') {
-      return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
+    if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
+      return [...inMemoryVehicles];
     }
     const q = query(collection(db, 'vehicles'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
@@ -46,7 +128,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
         location: data.location || 'Bordeaux',
         owner: data.owner || {
           name: 'Propriétaire',
-          avatar: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
+          avatar: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=150&q=80',
           responseTime: 'En moins d\'une heure',
           responseRate: 100
         },
@@ -63,21 +145,19 @@ export async function getVehicles(): Promise<Vehicle[]> {
     });
     
     if (list.length === 0) {
-      return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
+      return [...inMemoryVehicles];
     }
     return list;
   } catch (error) {
-    console.error('Error fetching vehicles:', error);
-    return [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
+    return [...inMemoryVehicles];
   }
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   const cleanSlug = decodeURIComponent(slug || '').trim().toLowerCase();
-  const allMocks = [...(yescapaData as Vehicle[]), ...MOCK_VEHICLES];
 
   try {
-    if (db.app.options.projectId !== 'mock-project-id') {
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
       try {
         const q = query(collection(db, 'vehicles'), where('slug', '==', slug));
         const querySnapshot = await getDocs(q);
@@ -98,8 +178,8 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
             available: data.available !== false,
             location: data.location || 'Bordeaux',
             owner: data.owner || {
-              name: 'Propriétaire',
-              avatar: 'https://i.pravatar.cc/150?u=Owner',
+              name: 'Cap Aventure Agence',
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
               responseTime: 'En moins d\'une heure',
               responseRate: 100
             },
@@ -115,45 +195,84 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
           };
         }
       } catch (firestoreErr) {
-        console.warn('Firestore fallback to local dataset:', firestoreErr);
+        // Fallback local
       }
     }
 
-    // Recherche robuste dans le jeu de données local (par slug exact, ID exact ou slug nettoyé)
-    const mockFound = allMocks.find(
+    // Recherche robuste dans le jeu de données dédupliqué
+    const found = inMemoryVehicles.find(
       v => v.slug.toLowerCase() === cleanSlug || 
            v.id.toLowerCase() === cleanSlug ||
            v.slug.toLowerCase().includes(cleanSlug) ||
            cleanSlug.includes(v.slug.toLowerCase())
     );
 
-    return mockFound || null;
+    return found || null;
   } catch (error) {
-    console.error('Error fetching vehicle by slug:', error);
-    const mockFound = allMocks.find(
+    const found = inMemoryVehicles.find(
       v => v.slug.toLowerCase() === cleanSlug || 
            v.id.toLowerCase() === cleanSlug
     );
-    return mockFound || null;
+    return found || null;
   }
 }
 
 export async function addVehicle(vehicle: Omit<Vehicle, 'id'>): Promise<string> {
-  const docRef = await addDoc(collection(db, 'vehicles'), {
+  const generatedId = `cap-${Date.now()}`;
+  const newVehicle: Vehicle = {
     ...vehicle,
-    createdAt: serverTimestamp(),
-  });
-  return docRef.id;
+    id: generatedId,
+  };
+
+  // Ajout en mémoire
+  inMemoryVehicles = [newVehicle, ...inMemoryVehicles];
+
+  try {
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
+      const docRef = await addDoc(collection(db, 'vehicles'), {
+        ...vehicle,
+        createdAt: serverTimestamp(),
+      });
+      return docRef.id;
+    }
+  } catch (err) {
+    console.warn('Fallback: saved in memory');
+  }
+
+  return generatedId;
 }
 
-export async function updateVehicle(id: string, vehicle: Partial<Vehicle>): Promise<void> {
-  const docRef = doc(db, 'vehicles', id);
-  await updateDoc(docRef, vehicle);
+export async function updateVehicle(id: string, updatedFields: Partial<Vehicle>): Promise<void> {
+  // Mise à jour en mémoire
+  inMemoryVehicles = inMemoryVehicles.map(v => {
+    if (v.id === id) {
+      return { ...v, ...updatedFields };
+    }
+    return v;
+  });
+
+  try {
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
+      const docRef = doc(db, 'vehicles', id);
+      await updateDoc(docRef, updatedFields);
+    }
+  } catch (err) {
+    console.warn('Fallback: updated in memory');
+  }
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
-  const docRef = doc(db, 'vehicles', id);
-  await deleteDoc(docRef);
+  // Suppression en mémoire
+  inMemoryVehicles = inMemoryVehicles.filter(v => v.id !== id);
+
+  try {
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
+      const docRef = doc(db, 'vehicles', id);
+      await deleteDoc(docRef);
+    }
+  } catch (err) {
+    console.warn('Fallback: deleted from memory');
+  }
 }
 
 // ==========================================
@@ -164,52 +283,75 @@ export async function createReservation(
   reservationInput: Omit<Reservation, 'id' | 'clientId' | 'clientName'>,
   clientInput: Omit<Client, 'id'>
 ): Promise<string> {
+  const resId = `res-${Date.now()}`;
+  const clientId = `cli-${Date.now()}`;
+
+  const newClient: Client = {
+    ...clientInput,
+    id: clientId,
+  };
+  const newReservation: Reservation = {
+    ...reservationInput,
+    id: resId,
+    clientId,
+    clientName: `${clientInput.firstName} ${clientInput.lastName}`,
+    status: 'CONFIRMEE'
+  };
+
+  inMemoryClients.unshift(newClient);
+  inMemoryReservations.unshift(newReservation);
+
   try {
-    const reservationId = await runTransaction(db, async (transaction) => {
-      const clientsRef = collection(db, 'clients');
-      const q = query(clientsRef, where('email', '==', clientInput.email));
-      const clientQuerySnap = await getDocs(q);
-      
-      let clientId = '';
-      if (!clientQuerySnap.empty) {
-        clientId = clientQuerySnap.docs[0].id;
-        const clientDocRef = doc(db, 'clients', clientId);
-        transaction.update(clientDocRef, {
-          lastName: clientInput.lastName,
-          firstName: clientInput.firstName,
-          phone: clientInput.phone,
-          drivingLicenseNumber: clientInput.drivingLicenseNumber,
-        });
-      } else {
-        const newClientDocRef = doc(collection(db, 'clients'));
-        clientId = newClientDocRef.id;
-        transaction.set(newClientDocRef, {
-          ...clientInput,
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
+      const reservationId = await runTransaction(db, async (transaction) => {
+        const clientsRef = collection(db, 'clients');
+        const q = query(clientsRef, where('email', '==', clientInput.email));
+        const clientQuerySnap = await getDocs(q);
+        
+        let cid = '';
+        if (!clientQuerySnap.empty) {
+          cid = clientQuerySnap.docs[0].id;
+          const clientDocRef = doc(db, 'clients', cid);
+          transaction.update(clientDocRef, {
+            lastName: clientInput.lastName,
+            firstName: clientInput.firstName,
+            phone: clientInput.phone,
+            drivingLicenseNumber: clientInput.drivingLicenseNumber,
+          });
+        } else {
+          const newClientDocRef = doc(collection(db, 'clients'));
+          cid = newClientDocRef.id;
+          transaction.set(newClientDocRef, {
+            ...clientInput,
+            createdAt: Timestamp.now(),
+          });
+        }
+
+        const newResDocRef = doc(collection(db, 'reservations'));
+        transaction.set(newResDocRef, {
+          ...reservationInput,
+          clientId: cid,
+          clientName: `${clientInput.firstName} ${clientInput.lastName}`,
           createdAt: Timestamp.now(),
         });
-      }
 
-      const newResDocRef = doc(collection(db, 'reservations'));
-      transaction.set(newResDocRef, {
-        ...reservationInput,
-        clientId,
-        clientName: `${clientInput.firstName} ${clientInput.lastName}`,
-        createdAt: Timestamp.now(),
+        return newResDocRef.id;
       });
 
-      return newResDocRef.id;
-    });
-
-    return reservationId;
+      return reservationId;
+    }
   } catch (error) {
-    console.error('Error in createReservation transaction:', error);
-    throw error;
+    console.warn('Fallback: reservation saved in memory');
   }
+
+  return resId;
 }
 
 export async function getReservations(): Promise<Reservation[]> {
   try {
-    if (db.app.options.projectId === 'mock-project-id') return [];
+    if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
+      return [...inMemoryReservations];
+    }
     const q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     const list: Reservation[] = [];
@@ -229,21 +371,29 @@ export async function getReservations(): Promise<Reservation[]> {
         specificDetails: data.specificDetails || {},
       });
     });
-    return list;
+    return list.length > 0 ? list : [...inMemoryReservations];
   } catch (error) {
-    console.error('Error fetching reservations:', error);
-    return [];
+    return [...inMemoryReservations];
   }
 }
 
 export async function updateReservationStatus(id: string, status: ReservationStatus): Promise<void> {
-  const docRef = doc(db, 'reservations', id);
-  await updateDoc(docRef, { status });
+  inMemoryReservations = inMemoryReservations.map(r => r.id === id ? { ...r, status } : r);
+  try {
+    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
+      const docRef = doc(db, 'reservations', id);
+      await updateDoc(docRef, { status });
+    }
+  } catch (err) {
+    // Memory fallback
+  }
 }
 
 export async function getClients(): Promise<Client[]> {
   try {
-    if (db.app.options.projectId === 'mock-project-id') return [];
+    if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
+      return [...inMemoryClients];
+    }
     const q = query(collection(db, 'clients'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     const list: Client[] = [];
@@ -258,349 +408,8 @@ export async function getClients(): Promise<Client[]> {
         drivingLicenseNumber: data.drivingLicenseNumber || '',
       });
     });
-    return list;
+    return list.length > 0 ? list : [...inMemoryClients];
   } catch (error) {
-    console.error('Error fetching clients:', error);
-    return [];
+    return [...inMemoryClients];
   }
 }
-
-// ==========================================
-// DONNÉES DE DÉMO (MOCK STYLE YESCAPA)
-// ==========================================
-
-export const MOCK_VEHICLES: Vehicle[] = [
-  {
-    id: 'van-1',
-    slug: 'volkswagen-california-coast-t6',
-    name: 'Volkswagen California Coast T6.1',
-    type: 'van_amenege',
-    description: 'Le compagnon d\'aventure historique et moderne à la fois. Prise en main facile, gabarit compact (hauteur < 2m pour les parkings et barrières de plages). Cuisine intégrée avec feux de cuisson, évier et réfrigérateur, toit relevable électrique avec couchage à lattes de pin et couchages confortables pour 4 personnes. Parfait pour les escapades sauvages en amoureux ou en petite famille.',
-    pricePerDay: 120,
-    seats: 4,
-    beds: 4,
-    features: ['Cuisine intégrée', 'Réfrigérateur 42L', 'Toit Relevable Électrique', 'Chauffage stationnaire diesel', 'Douchette extérieure', 'Régulateur de vitesse', 'Apple CarPlay', 'Table de camping extérieure'],
-    images: [
-      '/images/vehicles/van_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Bordeaux',
-    owner: {
-      name: 'Marc',
-      avatar: 'https://i.pravatar.cc/150?u=MarcVan1',
-      responseTime: 'En moins d\'une heure',
-      responseRate: 98
-    },
-    techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '7.5L/100km', enginePower: '150 ch' },
-    rating: 4.9, reviewCount: 14,
-    reviews: [
-      { id: 'rev-1', author: 'Sophie L.', date: '2026-05-15', rating: 5, comment: 'Superbe expérience ! Le van de Marc était d\'une propreté irréprochable et hyper maniable.' },
-      { id: 'rev-2', author: 'Thomas B.', date: '2026-06-02', rating: 4.8, comment: 'Très bon séjour à bord de ce California. Tout l\'équipement nécessaire est présent.' }
-    ]
-  },
-  {
-    id: 'cc-profile-1',
-    slug: 'challenger-260-graphite',
-    name: 'Challenger 260 Graphite Edition',
-    type: 'camping_car_profile',
-    description: 'Le profilé de luxe compact par excellence. Offre un espace de vie gigantesque avec son salon face-face (Smart Lounge) et son grand lit de pavillon escamotable électriquement (160x200cm). Une salle d\'eau moderne transversale arrière complète avec une immense penderie et un accès direct au garage à vélos chauffé.',
-    pricePerDay: 150,
-    seats: 4,
-    beds: 4,
-    features: ['Cuisine Équipée 3 feux', 'Grand Réfrigérateur 167L', 'Douche Séparée', 'Lit Pavillon Électrique', 'Porte-Vélos x3', 'Store extérieur', 'Chauffage sur carburant'],
-    images: [
-      '/images/vehicles/profile_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Paris',
-    owner: { name: 'Estelle', avatar: 'https://i.pravatar.cc/150?u=EstelleCC1', responseTime: 'En 2 heures', responseRate: 95 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.2L/100km', enginePower: '170 ch' },
-    rating: 4.8, reviewCount: 9,
-    reviews: [{ id: 'rev-3', author: 'Julien M.', date: '2026-04-20', rating: 5, comment: 'Camping-car d\'un confort exceptionnel. Le salon est gigantesque !' }]
-  },
-  {
-    id: 'cc-integral-1',
-    slug: 'hymer-b-class-780',
-    name: 'Hymer B-Class MasterLine I 780',
-    type: 'camping_car_integral',
-    description: 'L\'expérience ultime du voyage en hôtel 5 étoiles roulant. Volume intérieur exceptionnel, pare-brise panoramique pour une visibilité totale de la route. Isolation thermique et acoustique suprême d\'Hymer. Finitions haut de gamme en cuir et bois précieux, grand lit central arrière et lit pavillon cabine.',
-    pricePerDay: 220,
-    seats: 4,
-    beds: 5,
-    features: ['Chauffage Central Alde', 'Double Plancher isolé', 'Four à Gaz intégré', 'Douche Indépendante Deluxe', 'Caméra de Recul 360°', 'Panneaux solaires 200W', 'Climatisation cellule', 'TV 32 pouces'],
-    images: [
-      '/images/vehicles/integral_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Lyon',
-    owner: { name: 'Jean-Pierre', avatar: 'https://i.pravatar.cc/150?u=JPIntegral1', responseTime: 'En moins de 12 heures', responseRate: 90 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '11.5L/100km', enginePower: '180 ch' },
-    rating: 5.0, reviewCount: 5,
-    reviews: [{ id: 'rev-4', author: 'Guillaume P.', date: '2026-05-30', rating: 5, comment: 'Le grand luxe ! Ce Hymer est un véritable palace roulant.' }]
-  },
-  {
-    id: 'fourgon-1',
-    slug: 'adria-twin-sports-600',
-    name: 'Adria Twin Sports 600 SPB',
-    type: 'fourgon_amenege',
-    description: 'L\'équilibre parfait entre le confort d\'un camping-car et la maniabilité d\'un van. Son toit relevable exclusif offre une chambre supplémentaire suspendue dans les arbres. Grand lit transversal arrière repliable pour libérer une soute immense pour vos vélos ou vos planches de surf.',
-    pricePerDay: 135,
-    seats: 4,
-    beds: 4,
-    features: ['Cabinet de Toilette Duplex', 'Toit Relevable avec couchage', 'Soute Sportive Modulaire', 'Panneau Solaire 120W', 'Porte-Vélos pivotant', 'Store extérieur', 'GPS spécial camping-car'],
-    images: [
-      '/images/vehicles/fourgon_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Toulouse',
-    owner: { name: 'Adrien', avatar: 'https://i.pravatar.cc/150?u=AdrienFourgon1', responseTime: 'En 1 heure', responseRate: 100 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '8.4L/100km', enginePower: '140 ch' },
-    rating: 4.7, reviewCount: 11,
-    reviews: [{ id: 'rev-5', author: 'Lucie D.', date: '2026-06-10', rating: 4.5, comment: 'Parfait pour notre séjour de surf dans les Landes. La soute est très grande.' }]
-  },
-  {
-    id: 'van-2',
-    slug: 'ford-transit-nugget',
-    name: 'Ford Transit Custom Nugget Plus',
-    type: 'van_amenege',
-    description: 'Un van aménagé ultra complet avec WC intégrés (rare pour cette taille). Son agencement unique sépare l\'espace salon/conduite de la zone cuisine/sanitaire à l\'arrière. Très agréable à conduire, il passe sous les barres des 2m10 et permet un stationnement aisé en ville.',
-    pricePerDay: 115,
-    seats: 5,
-    beds: 4,
-    features: ['WC fixes avec lavabo', 'Cuisine en L arrière', 'Toit relevable', 'Douchette extérieure', 'Chauffage stationnaire', 'Boîte automatique', 'Radars AV/AR'],
-    images: [
-      '/images/vehicles/van_2.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Marseille',
-    owner: { name: 'Chloé', avatar: 'https://i.pravatar.cc/150?u=ChloeVan2', responseTime: 'En 3 heures', responseRate: 92 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '8.0L/100km', enginePower: '185 ch' },
-    rating: 4.6, reviewCount: 8,
-    reviews: [{ id: 'rev-6', author: 'Antoine R.', date: '2026-07-01', rating: 5, comment: 'Super van, le WC intégré est un vrai plus !' }]
-  },
-  {
-    id: 'fourgon-2',
-    slug: 'possl-summit-640',
-    name: 'Pössl Summit 640 Prime',
-    type: 'fourgon_amenege',
-    description: 'Le roi des fourgons avec lits jumeaux ! Profitez du confort de lits séparés de grande dimension transformables en lit king-size. La particularité du "Prime" est son Skyroof ouvrant panoramique à l\'avant, inondant le salon de lumière. Idéal pour un couple qui recherche espace et luminosité.',
-    pricePerDay: 140,
-    seats: 4,
-    beds: 3,
-    features: ['Lits Jumeaux arrières', 'Skyroof Panoramique', 'Salle de bain pivotante', 'Réfrigérateur à compression', 'Batterie Lithium', 'Attelage', 'Stores occultants cabine'],
-    images: [
-      '/images/vehicles/fourgon_2.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Nantes',
-    owner: { name: 'Bernard', avatar: 'https://i.pravatar.cc/150?u=BernardFourgon2', responseTime: 'En moins d\'une heure', responseRate: 100 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '9.0L/100km', enginePower: '160 ch' },
-    rating: 4.9, reviewCount: 22,
-    reviews: [{ id: 'rev-7', author: 'Martine V.', date: '2026-06-25', rating: 5, comment: 'Bernard est très soigneux et son fourgon est dans un état irréprochable. Le skyroof change tout.' }]
-  },
-  {
-    id: 'cc-capucine-1',
-    slug: 'benimar-sport-340',
-    name: 'Benimar Sport 340 Up',
-    type: 'camping_car_profile',
-    description: 'Le camping-car familial par excellence avec ses 5 places carte grise et couchages sans aucune manipulation ! Un grand lit capucine au-dessus de la cabine, des lits superposés à l\'arrière pour les enfants, et un salon spacieux. Tout est inclus et prêt à partir (vaisselle, cales, tuyau, rallonge).',
-    pricePerDay: 130,
-    seats: 5,
-    beds: 5,
-    features: ['Lits Superposés', 'Grand Lit Capucine', 'Soute modulable', 'Grand Réfrigérateur/Congélateur', 'Store Extérieur', 'Panneau Solaire', 'Porte-vélos x4'],
-    images: [
-      '/images/vehicles/capucine_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Rennes',
-    owner: { name: 'Famille Dupont', avatar: 'https://i.pravatar.cc/150?u=DupontCapucine1', responseTime: 'En 4 heures', responseRate: 88 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Manuelle', consumption: '10.5L/100km', enginePower: '130 ch' },
-    rating: 4.5, reviewCount: 15,
-    reviews: [{ id: 'rev-8', author: 'Pauline C.', date: '2026-05-10', rating: 4, comment: 'Véhicule très pratique pour notre famille de 5, les enfants ont adoré les lits superposés.' }]
-  },
-  {
-    id: 'van-3',
-    slug: 'mercedes-marco-polo',
-    name: 'Mercedes Marco Polo AMG Line',
-    type: 'van_amenege',
-    description: 'Le luxe absolu en format van. Finitions intérieures premium inspirées des yachts, sièges en cuir véritable, ambiance lumineuse réglable, suspension pneumatique pour un confort de route inégalé. Toit relevable électriquement, système multimédia MBUX. L\'élégance et l\'aventure réunies.',
-    pricePerDay: 160,
-    seats: 4,
-    beds: 4,
-    features: ['Finition AMG Line', 'Intérieur Cuir', 'Système Son Burmester', 'Suspension Airmatic', 'Caméras 360', 'Cuisine Premium', 'Chauffage stationnaire'],
-    images: [
-      '/images/vehicles/van_3.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Nice',
-    owner: { name: 'Alexandre', avatar: 'https://i.pravatar.cc/150?u=AlexandreVan3', responseTime: 'En moins d\'une heure', responseRate: 100 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '7.8L/100km', enginePower: '239 ch' },
-    rating: 5.0, reviewCount: 6,
-    reviews: [{ id: 'rev-9', author: 'Stéphane G.', date: '2026-06-15', rating: 5, comment: 'Un van hors norme. Le moteur V300d est puissant et silencieux, l\'intérieur est magique. Alexandre est très arrangeant.' }]
-  },
-  {
-    id: 'cc-profile-2',
-    slug: 'pilote-galaxy-g740',
-    name: 'Pilote Galaxy G740 Evidence',
-    type: 'camping_car_integral',
-    description: 'Intégral français haut de gamme aux espaces généreux. Salon face à face avec grande table centrale, cuisine en L sur-équipée. Sa chambre arrière offre un lit central majestueux (150cm de large) réglable en hauteur, avec salle d\'eau à double séparationnement. Tout le confort comme à la maison.',
-    pricePerDay: 180,
-    seats: 4,
-    beds: 4,
-    features: ['Lit Central King Size', 'Douche Indépendante', 'TV connectée 24"', 'Antenne Satellite', 'Store et panneau solaire', 'Tiroir extérieur', 'Onduleur 2000W'],
-    images: [
-      '/images/vehicles/integral_1.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Strasbourg',
-    owner: { name: 'Sylvie', avatar: 'https://i.pravatar.cc/150?u=SylvieCC2', responseTime: 'En 2 heures', responseRate: 94 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '10.2L/100km', enginePower: '160 ch' },
-    rating: 4.8, reviewCount: 18,
-    reviews: [{ id: 'rev-10', author: 'Laurent K.', date: '2026-05-02', rating: 5, comment: 'Le véhicule idéal pour notre escapade en Forêt Noire. Le confort thermique est excellent même par temps froid.' }]
-  },
-  {
-    id: 'fourgon-3',
-    slug: 'volkswagen-grand-california',
-    name: 'Volkswagen Grand California 600',
-    type: 'fourgon_amenege',
-    description: 'Le grand frère du California basé sur le Crafter. Il inclut une véritable salle d\'eau tout-en-un (douche, lavabo, WC) et un lit transversal arrière ultra confortable grâce à ses extensions latérales de carrosserie. Finitions claires, style marin et toit panoramique sublime.',
-    pricePerDay: 155,
-    seats: 4,
-    beds: 2,
-    features: ['Salle d\'eau complète', 'Lit transversal spacieux', 'Chauffage Gaz/Électricité', 'Panneau de contrôle tactile', 'Éclairage d\'ambiance LED', 'Mobilier blanc brillant', 'Table + chaises intégrées aux portes'],
-    images: [
-      '/images/vehicles/fourgon_3.png',
-      '/images/vehicles/living_interior.png',
-      '/images/vehicles/bed_interior.png',
-      '/images/vehicles/kitchen_interior.png'
-    ],
-    available: true,
-    location: 'Biarritz',
-    owner: { name: 'Maxime', avatar: 'https://i.pravatar.cc/150?u=MaximeFourgon3', responseTime: 'En moins de 30 minutes', responseRate: 100 },
-    techSpecs: { fuel: 'Diesel', transmission: 'Automatique', consumption: '9.5L/100km', enginePower: '177 ch' },
-    rating: 4.9, reviewCount: 12,
-    reviews: [{ id: 'rev-11', author: 'Emma L.', date: '2026-07-05', rating: 5, comment: 'L\'expérience California avec la salle d\'eau en plus ! Conduite très sûre et confortable malgré sa grande taille.' }]
-  },
-  {
-    id: 'caravane-adria-1',
-    slug: 'adria-alpina-573up-2018',
-    name: 'Adria Alpina 573UP',
-    type: 'caravane',
-    description: 'Adria alpina 573up, modèle 2018.\nLa caravane a peu servi et est en excellent état. Aucun animal n\'y a jamais été transporté et il n\'y a jamais eu de fumée.\n\nÉquipement supplémentaire inclus :\n- Auvent Fiamma zip XL avec 3 parois\n- AL-KO déplaceur (mover)\n- Panneau solaire\n- Surmatelas sur mesure pour lit double\n- Téléviseur Finlux 24 pouces\n\nCaravane bien équipée : Aldevarme 3020HE avec chauffage au sol à eau pour un chauffage uniforme et confortable, four, micro-ondes, trappe à skis, trappe de chargement, Bluetooth, alarme à gaz nx1, détecteur de fumée, 1 bouteille de gaz. Protège-matelas posé sur le surmatelas sur mesure. Tapis de sol et coussins décoratifs Adria d\'origine. Possibilité d\'ajouter du matériel supplémentaire. Pneus neufs en 2024. Batterie neuve de 115 Ah en 2025. Entretien du véhicule, contrôle du niveau d\'essence et de l\'humidité en 2025. Nouveau test d\'humidité effectué le 26 juin.',
-    pricePerDay: 110,
-    seats: 4,
-    beds: 4,
-    features: [
-      'Auvent Fiamma zip XL',
-      'AL-KO déplaceur',
-      'Panneau solaire',
-      'Surmatelas sur mesure',
-      'Téléviseur Finlux 24"',
-      'Chauffage au sol à eau Alde',
-      'Four & Micro-ondes',
-      'Alarme gaz nx1',
-      'Détecteur de fumée'
-    ],
-    images: [
-      '/images/vehicles/adria_1.jpg',
-      '/images/vehicles/adria_2.jpg',
-      '/images/vehicles/adria_3.jpg',
-      '/images/vehicles/adria_4.jpg',
-      '/images/vehicles/adria_5.jpg',
-      '/images/vehicles/adria_6.jpg',
-      '/images/vehicles/adria_7.jpg',
-      '/images/vehicles/adria_8.jpg',
-      '/images/vehicles/adria_9.jpg',
-      '/images/vehicles/adria_10.jpg'
-    ],
-    available: true,
-    location: 'Bordeaux',
-    owner: {
-      name: 'Mathias',
-      avatar: 'https://i.pravatar.cc/150?u=MathiasAdria',
-      responseTime: 'En moins d\'une heure',
-      responseRate: 100
-    },
-    techSpecs: {
-      fuel: 'Aucun',
-      transmission: 'Aucune',
-      consumption: 'N/A',
-      enginePower: 'N/A'
-    },
-    rating: 5.0,
-    reviewCount: 0,
-    reviews: []
-  },
-  {
-    id: 'caravane-pme-1',
-    slug: 'pme-caravane-1984',
-    name: 'Caravane Vintage PME',
-    type: 'caravane',
-    description: 'Caravane PME, modèle 1984. Propre et super simple.\n\nCaractéristiques du véhicule :\n- Longueur : 595 cm\n- Largeur : 224 cm\n- Poids total : 1 050 kg\n- Poids propre : 860 kg\n- Charge utile : 190 kg\n- Lieux de couchage : 4\n- Garée en Norvège\n\nPas de garantie ni de rapport de condition. Idéal pour une expérience de camping rétro, authentique et sans fioritures.',
-    pricePerDay: 65,
-    seats: 4,
-    beds: 4,
-    features: [
-      'Style Vintage 1984',
-      'Super simple & Propre',
-      'Longueur 5m95',
-      'Poids plume 1050kg',
-      '4 Couchages',
-      'Cabinet de toilette rétro'
-    ],
-    images: [
-      '/images/vehicles/pme_1.jpg',
-      '/images/vehicles/pme_2.jpg',
-      '/images/vehicles/pme_3.jpg',
-      '/images/vehicles/pme_4.jpg',
-      '/images/vehicles/pme_5.jpg'
-    ],
-    available: true,
-    location: 'Norvège',
-    owner: {
-      name: 'Elena',
-      avatar: 'https://i.pravatar.cc/150?u=ElenaPME',
-      responseTime: 'En moins d\'une heure',
-      responseRate: 100
-    },
-    techSpecs: {
-      fuel: 'Aucun',
-      transmission: 'Aucune',
-      consumption: 'N/A',
-      enginePower: 'N/A'
-    },
-    rating: 4.8,
-    reviewCount: 2,
-    reviews: [
-      { id: 'rev-pme-1', author: 'Lars O.', date: '2026-06-15', rating: 5, comment: 'Une caravane incroyable ! Ultra légère et facile à tracter sur les routes des fjords. Très propre.' },
-      { id: 'rev-pme-2', author: 'Astrid S.', date: '2026-07-02', rating: 4.5, comment: 'Un retour dans le temps super agréable. Couchages très confortables pour notre petite famille.' }
-    ]
-  }
-];
