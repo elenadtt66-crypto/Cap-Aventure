@@ -14,6 +14,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 import { Vehicle, Client, Reservation, ReservationStatus } from '@/types';
 import cleanVehiclesDataset from '@/data/yescapa-vehicles.json';
 
@@ -370,6 +371,34 @@ export async function createReservation(
 
 export async function getReservations(): Promise<Reservation[]> {
   inMemoryReservations = getStoredReservations();
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        return data.map((r: any) => ({
+          id: r.id,
+          vehicleId: r.vehicle_id || r.vehicleId || '',
+          vehicleName: r.vehicle_name || r.vehicleName || '',
+          clientId: r.client_id || r.clientId || '',
+          clientName: r.client_name || r.clientName || '',
+          startDate: r.start_date || r.startDate || '',
+          endDate: r.end_date || r.endDate || '',
+          totalDays: r.total_days || r.totalDays || 0,
+          totalPrice: r.total_price || r.totalPrice || 0,
+          status: r.status || 'EN_ATTENTE',
+          specificDetails: r.specific_details || r.specificDetails || {},
+        }));
+      }
+    } catch (sbErr) {
+      console.warn('Supabase fetch fallback to local storage');
+    }
+  }
+
   try {
     if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
       return [...inMemoryReservations];
