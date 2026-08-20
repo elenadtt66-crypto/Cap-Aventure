@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { getVehicles, createReservation } from '@/services/db';
+import { getVehicles, createReservation, updateReservationStatus, updateLatestReservationStatus } from '@/services/db';
 import { Vehicle, VehicleType } from '@/types';
 import VanForm from '@/components/forms/VanForm';
 import ProfileForm from '@/components/forms/ProfileForm';
@@ -10,6 +10,7 @@ import IntegralForm from '@/components/forms/IntegralForm';
 import FourgonForm from '@/components/forms/FourgonForm';
 import DatePicker from '@/components/ui/DatePicker';
 import SelectMenu, { SelectMenuOption } from '@/components/ui/SelectMenu';
+import PcsPaymentModal from '@/components/PcsPaymentModal';
 
 import { 
   Calendar,
@@ -29,6 +30,8 @@ import {
 function ReservationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // Liste complète des véhicules pour sélection manuelle si besoin
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -55,6 +58,21 @@ function ReservationContent() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  const [isPaidSuccess, setIsPaidSuccess] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setIsPaidSuccess(true);
+      setSuccess(true);
+      const latestId = typeof window !== 'undefined' ? sessionStorage.getItem('latest_res_id') : null;
+      if (latestId) {
+        updateReservationStatus(latestId, 'CONFIRMEE').catch(console.error);
+      } else {
+        updateLatestReservationStatus('CONFIRMEE').catch(console.error);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadData() {
@@ -144,17 +162,20 @@ function ReservationContent() {
     setSubmitting(true);
 
     try {
-      await createReservation({
+      const newResId = await createReservation({
         vehicleId: currentVehicle!.id,
         vehicleName: currentVehicle!.name,
-        clientName: `${clientData.firstName} ${clientData.lastName}`,
         startDate,
         endDate,
         totalDays,
         totalPrice: priceBreakdown.total,
         status: 'EN_ATTENTE',
         specificDetails: specificData,
-      });
+      }, clientData);
+
+      if (typeof window !== 'undefined' && newResId) {
+        sessionStorage.setItem('latest_res_id', newResId);
+      }
 
       setSuccess(true);
     } catch (err: any) {
@@ -184,45 +205,57 @@ function ReservationContent() {
             <CheckIcon className="w-10 h-10" />
           </div>
 
-          <span className="inline-block px-4 py-1.5 bg-brand-gold-light text-brand-navy text-xs font-extrabold rounded-full tracking-wider uppercase">
-            Demande transmise avec succès
+          <span className={`inline-block px-4 py-1.5 text-xs font-extrabold rounded-full tracking-wider uppercase ${
+            isPaidSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-brand-gold-light text-brand-navy'
+          }`}>
+            {isPaidSuccess ? 'Paiement Chiffré Confirmé' : 'Demande transmise avec succès'}
           </span>
 
           <h1 className="text-3xl font-extrabold text-brand-text tracking-tight">
-            Félicitations {clientData.firstName} !
+            {isPaidSuccess ? 'Paiement Réussi !' : `Félicitations ${clientData.firstName || ''} !`}
           </h1>
 
           <p className="text-sm text-brand-muted leading-relaxed">
-            Votre demande de réservation pour le véhicule <strong className="text-brand-text font-bold">{currentVehicle?.name}</strong> du <span className="text-brand-text font-bold">{new Date(startDate).toLocaleDateString('fr-FR')}</span> au <span className="text-brand-text font-bold">{new Date(endDate).toLocaleDateString('fr-FR')}</span> ({totalDays} jours) a été transmise au propriétaire.
+            {isPaidSuccess 
+              ? 'Votre paiement a été validé et encaissé sur votre compte marchand Stripe. Votre réservation est confirmée !'
+              : `Votre demande de réservation pour le véhicule ${currentVehicle?.name || ''} a été transmise avec succès.`}
           </p>
 
           <div className="p-4 bg-brand-beige rounded-2xl text-left border border-brand-border space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className="text-brand-muted">Montant estimé TTC :</span>
+              <span className="text-brand-muted">Montant TTC :</span>
               <span className="font-bold text-brand-accent font-mono text-sm">{priceBreakdown.total} €</span>
             </div>
             <div className="flex justify-between">
               <span className="text-brand-muted">Statut du dossier :</span>
-              <span className="font-bold text-[#CA8A04] flex items-center">
-                ● En attente de validation
+              <span className={`font-bold flex items-center ${isPaidSuccess ? 'text-emerald-600' : 'text-[#CA8A04]'}`}>
+                {isPaidSuccess ? '● Payé & Confirmé (Stripe Test)' : '● En attente de validation'}
               </span>
             </div>
           </div>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <button
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="px-6 py-3.5 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <CardIcon className="w-4 h-4" />
+              <span>Payer {priceBreakdown.total} € (Carte / Virement)</span>
+            </button>
+            <button
               onClick={() => router.push('/vehicules')}
               className="px-6 py-3.5 bg-white border border-brand-border rounded-xl text-xs font-extrabold text-brand-text hover:bg-brand-hover transition-colors cursor-pointer"
             >
               Explorer d'autres véhicules
             </button>
-            <button
-              onClick={() => router.push('/')}
-              className="px-6 py-3.5 bg-brand-accent text-white rounded-xl text-xs font-extrabold hover:bg-brand-accent-hover transition-colors cursor-pointer"
-            >
-              Retour à l'accueil
-            </button>
           </div>
+
+          <PcsPaymentModal
+            isOpen={isPaymentModalOpen}
+            onClose={() => setIsPaymentModalOpen(false)}
+            amount={priceBreakdown.total}
+            reservationTitle={`Réservation ${currentVehicle?.name || 'Véhicule'}`}
+          />
         </div>
       </div>
     );

@@ -36,9 +36,11 @@ export default function AnimatedSection({
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>({ threshold });
   const v = variants[variant];
 
+  const Component = Tag as any;
+
   return (
-    <Tag
-      ref={ref as React.Ref<HTMLDivElement>}
+    <Component
+      ref={ref}
       className={`${className} transition-all ${v.from} ${isVisible ? v.to : ''}`}
       style={{
         transitionDuration: `${duration}ms`,
@@ -47,6 +49,6 @@ export default function AnimatedSection({
       }}
     >
       {children}
-    </Tag>
+    </Component>
   );
 }

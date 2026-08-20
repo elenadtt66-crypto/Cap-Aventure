@@ -70,6 +70,12 @@ export default function AdminReservations() {
 
   useEffect(() => {
     loadData();
+    window.addEventListener('focus', loadData);
+    window.addEventListener('storage', loadData);
+    return () => {
+      window.removeEventListener('focus', loadData);
+      window.removeEventListener('storage', loadData);
+    };
   }, []);
 
   const handleStatusUpdate = async (id: string, newStatus: ReservationStatus) => {

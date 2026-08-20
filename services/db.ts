@@ -17,9 +17,7 @@ import { db } from '@/lib/firebase';
 import { Vehicle, Client, Reservation, ReservationStatus } from '@/types';
 import cleanVehiclesDataset from '@/data/yescapa-vehicles.json';
 
-// Dataset en mémoire pour mode démo/hors-ligne fluide
-let inMemoryVehicles: Vehicle[] = [...(cleanVehiclesDataset as Vehicle[])];
-let inMemoryReservations: Reservation[] = [
+const initialReservations: Reservation[] = [
   {
     id: 'res-demo-01',
     vehicleId: 'cap-van-01',
@@ -58,17 +56,39 @@ let inMemoryReservations: Reservation[] = [
     vehicleName: 'Hymer B-Class MasterLine I 780',
     clientId: 'cli-03',
     clientName: 'Jean Valérien',
-    startDate: '2026-10-05',
-    endDate: '2026-10-15',
-    totalDays: 10,
-    totalPrice: 2350,
-    status: 'CONFIRMEE',
+    startDate: '2026-09-20',
+    endDate: '2026-09-27',
+    totalDays: 7,
+    totalPrice: 1540,
+    status: 'EN_ATTENTE',
     specificDetails: {
-      luxuryLinenPack: true,
-      finalCleaningService: true
+      roofTent: true,
+      notes: 'Voyage prévu vers les Alpes'
     }
   }
 ];
+
+function getStoredReservations(): Reservation[] {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('cap_aventure_reservations');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+  }
+  return initialReservations;
+}
+
+function saveStoredReservations(list: Reservation[]) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('cap_aventure_reservations', JSON.stringify(list));
+  }
+}
+
+let inMemoryVehicles: Vehicle[] = [...(cleanVehiclesDataset as Vehicle[])];
+let inMemoryReservations: Reservation[] = getStoredReservations();
 
 let inMemoryClients: Client[] = [
   {
@@ -295,11 +315,12 @@ export async function createReservation(
     id: resId,
     clientId,
     clientName: `${clientInput.firstName} ${clientInput.lastName}`,
-    status: 'CONFIRMEE'
+    status: reservationInput.status || 'EN_ATTENTE'
   };
 
   inMemoryClients.unshift(newClient);
   inMemoryReservations.unshift(newReservation);
+  saveStoredReservations(inMemoryReservations);
 
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
@@ -348,6 +369,7 @@ export async function createReservation(
 }
 
 export async function getReservations(): Promise<Reservation[]> {
+  inMemoryReservations = getStoredReservations();
   try {
     if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
       return [...inMemoryReservations];
@@ -378,7 +400,9 @@ export async function getReservations(): Promise<Reservation[]> {
 }
 
 export async function updateReservationStatus(id: string, status: ReservationStatus): Promise<void> {
+  inMemoryReservations = getStoredReservations();
   inMemoryReservations = inMemoryReservations.map(r => r.id === id ? { ...r, status } : r);
+  saveStoredReservations(inMemoryReservations);
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
       const docRef = doc(db, 'reservations', id);
@@ -386,6 +410,14 @@ export async function updateReservationStatus(id: string, status: ReservationSta
     }
   } catch (err) {
     // Memory fallback
+  }
+}
+
+export async function updateLatestReservationStatus(status: ReservationStatus): Promise<void> {
+  inMemoryReservations = getStoredReservations();
+  if (inMemoryReservations.length > 0) {
+    inMemoryReservations[0].status = status;
+    saveStoredReservations(inMemoryReservations);
   }
 }
 
