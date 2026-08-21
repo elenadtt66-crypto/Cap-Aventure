@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { logoutAdmin } from '@/services/auth';
 import CapAventureLogo from '@/components/CapAventureLogo';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -86,9 +87,12 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* User Session Info / Logout */}
-      <div className="p-4 border-t border-brand-border mt-auto">
-        <div className="flex items-center p-3 bg-brand-hover rounded-xl mb-3 border border-brand-border/40">
+      {/* User Session Info & Theme / Logout */}
+      <div className="p-4 border-t border-brand-border mt-auto space-y-3">
+        {/* Toggle Theme dans la Sidebar */}
+        <ThemeToggle variant="button" />
+
+        <div className="flex items-center p-3 bg-brand-hover rounded-xl border border-brand-border/40">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="relative flex-shrink-0">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-accent to-brand-accent-hover text-white flex items-center justify-center font-bold text-xs font-mono shadow-sm">

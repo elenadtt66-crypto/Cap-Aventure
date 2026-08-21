@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Phone, User } from 'lucide-react';
 import CapAventureLogo from '@/components/CapAventureLogo';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function PublicLayout({
   children,
@@ -80,7 +81,8 @@ export default function PublicLayout({
           </nav>
 
           {/* Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            <ThemeToggle variant="icon" />
             <Link
               href="/contact"
               className="flex items-center space-x-2 text-xs font-bold text-brand-text/70 hover:text-brand-accent transition-colors duration-200"
@@ -97,13 +99,16 @@ export default function PublicLayout({
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-brand-text hover:text-brand-accent transition-colors duration-250 cursor-pointer"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Menu & Theme Toggle */}
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle variant="icon" />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-brand-text hover:text-brand-accent transition-colors duration-250 cursor-pointer"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
@@ -124,6 +129,7 @@ export default function PublicLayout({
               ))}
             </div>
             <div className="pt-4 flex flex-col space-y-3">
+              <ThemeToggle variant="button" />
               <a
                 href="tel:+33780976364"
                 className="flex items-center space-x-2 text-sm font-semibold text-brand-text"

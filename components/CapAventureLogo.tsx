@@ -18,8 +18,6 @@ export default function CapAventureLogo({
 }: CapAventureLogoProps) {
   const navy = '#1C2B4A';
   const gold = '#C9A035';
-  const textColor = invertText ? '#FFFFFF' : navy;
-  const subColor = invertText ? 'rgba(255,255,255,0.65)' : '#64748B';
 
   // Icône SVG — le badge rond avec montagnes + soleil + véhicules
   const Icon = ({ size = 56 }: { size?: number }) => (
@@ -30,23 +28,21 @@ export default function CapAventureLogo({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
+      className="flex-shrink-0"
     >
       {/* Cercle extérieur */}
-      <circle cx="60" cy="54" r="46" stroke={navy} strokeWidth="3" fill="white" />
+      <circle cx="60" cy="54" r="46" className="stroke-brand-text fill-brand-card" strokeWidth="3" />
 
       {/* Soleil / Demi-lune or */}
       <circle cx="60" cy="26" r="9" fill={gold} opacity="0.9" />
-      <rect x="51" y="26" width="18" height="10" fill="white" />
+      <rect x="51" y="26" width="18" height="10" className="fill-brand-card" />
 
       {/* Montagnes — 3 pics */}
-      {/* Pic gauche */}
-      <path d="M22 72 L38 44 L48 60 Z" fill={navy} opacity="0.85" />
-      {/* Pic central (plus grand) */}
-      <path d="M38 72 L60 30 L82 72 Z" fill={navy} />
-      {/* Pic droit */}
-      <path d="M72 72 L82 52 L98 72 Z" fill={navy} opacity="0.75" />
-      {/* Cache bas montagne pour laisser place aux véhicules */}
-      <rect x="8" y="66" width="104" height="12" fill="white" />
+      <path d="M22 72 L38 44 L48 60 Z" className="fill-brand-text opacity-85" />
+      <path d="M38 72 L60 30 L82 72 Z" className="fill-brand-text" />
+      <path d="M72 72 L82 52 L98 72 Z" className="fill-brand-text opacity-75" />
+      {/* Cache bas montagne */}
+      <rect x="8" y="66" width="104" height="12" className="fill-brand-card" />
 
       {/* Route / sol courbé */}
       <ellipse cx="60" cy="78" rx="50" ry="6" fill={navy} opacity="0.12" />
@@ -95,20 +91,18 @@ export default function CapAventureLogo({
         <div className="flex flex-col leading-none">
           <div className="flex items-baseline gap-0.5">
             <span
-              className="font-extrabold tracking-tighter text-2xl"
-              style={{ color: textColor, fontFamily: 'var(--font-jakarta, system-ui)' }}
+              className="font-extrabold tracking-tighter text-2xl text-brand-text"
             >
               CAP
             </span>
             <span
-              className="font-extrabold tracking-tighter text-2xl ml-1.5"
-              style={{ color: gold, fontFamily: 'var(--font-jakarta, system-ui)' }}
+              className="font-extrabold tracking-tighter text-2xl ml-1.5 text-brand-accent"
             >
               AVENTURE
             </span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span style={{ color: subColor }} className="text-[9px] font-bold tracking-widest uppercase">
+            <span className="text-[9px] font-bold tracking-widest uppercase text-brand-muted">
               — Location de Camping-cars & Vans —
             </span>
           </div>
@@ -125,19 +119,17 @@ export default function CapAventureLogo({
         <div className="flex flex-col leading-none">
           <div className="flex items-baseline">
             <span
-              className="font-extrabold tracking-tight text-sm"
-              style={{ color: textColor, fontFamily: 'var(--font-jakarta, system-ui)' }}
+              className="font-extrabold tracking-tight text-sm text-brand-text"
             >
               CAP
             </span>
             <span
-              className="font-extrabold tracking-tight text-sm ml-1"
-              style={{ color: gold, fontFamily: 'var(--font-jakarta, system-ui)' }}
+              className="font-extrabold tracking-tight text-sm ml-1 text-brand-accent"
             >
               AVENTURE
             </span>
           </div>
-          <span style={{ color: subColor }} className="text-[8px] font-semibold tracking-wider uppercase mt-0.5">
+          <span className="text-[8px] font-semibold tracking-wider uppercase mt-0.5 text-brand-muted">
             Location de Camping-cars & Vans
           </span>
         </div>

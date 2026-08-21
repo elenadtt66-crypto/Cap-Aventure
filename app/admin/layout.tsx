@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from '@/components/admin/Sidebar';
 import { RefreshCw, Menu } from 'lucide-react';
 import CapAventureLogo from '@/components/CapAventureLogo';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function AdminLayout({
   children,
@@ -67,6 +68,7 @@ export default function AdminLayout({
           <CapAventureLogo variant="compact" />
         </div>
         <div className="flex items-center space-x-2">
+          <ThemeToggle variant="icon" />
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-accent to-brand-accent-hover text-white flex items-center justify-center font-bold text-xs font-mono shadow-sm">
             AD
           </div>

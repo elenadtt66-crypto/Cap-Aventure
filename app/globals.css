@@ -1,39 +1,73 @@
 @import "tailwindcss";
 
+:root {
+  --background: #F8F8F6;
+  --foreground: #1C2B4A;
+
+  --brand-beige: #F8F8F6;
+  --brand-card: #FFFFFF;
+  --brand-hover: #F2F2F0;
+  --brand-border: #E8E8E4;
+
+  --brand-text: #1C2B4A;
+  --brand-muted: #6B7A94;
+
+  --brand-accent: #C9A035;
+  --brand-accent-hover: #A8832A;
+
+  --brand-navy: #1C2B4A;
+  --brand-navy-hover: #142038;
+  --brand-gold: #C9A035;
+  --brand-gold-light: #FEF3CD;
+}
+
+.dark {
+  --background: #0B0E14;
+  --foreground: #F1F3F5;
+
+  --brand-beige: #0B0E14;
+  --brand-card: #161A23;
+  --brand-hover: #222836;
+  --brand-border: #262D3D;
+
+  --brand-text: #F1F3F5;
+  --brand-muted: #8E99AF;
+
+  --brand-accent: #E5B842;
+  --brand-accent-hover: #F5C953;
+
+  --brand-navy: #1A2234;
+  --brand-navy-hover: #242F46;
+  --brand-gold: #E5B842;
+  --brand-gold-light: #2B2414;
+}
+
 @theme {
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-body: var(--font-dm), system-ui, sans-serif;
   
-  /* ——— Palette Cap Aventure — Navy + Or sur fond blanc propre ——— */
-  /* Couleurs du logo : Navy #1C2B4A | Or #C9A035 — fond neutre lumineux */
+  --color-brand-beige: var(--brand-beige);
+  --color-brand-card: var(--brand-card);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-border: var(--brand-border);
 
-  --color-brand-beige: #F8F8F6;          /* Blanc cassé neutre — propre, pas kaki */
-  --color-brand-card: #FFFFFF;
-  --color-brand-hover: #F2F2F0;          /* Gris très clair au hover — neutre */
-  --color-brand-border: #E8E8E4;         /* Bordure gris clair légèrement warm */
+  --color-brand-text: var(--brand-text);
+  --color-brand-muted: var(--brand-muted);
 
-  --color-brand-text: #1C2B4A;           /* Navy — couleur exacte du logo */
-  --color-brand-muted: #6B7A94;          /* Navy-gris — textes secondaires */
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
 
-  --color-brand-accent: #C9A035;         /* Or — couleur exacte du logo */
-  --color-brand-accent-hover: #A8832A;   /* Or foncé au hover */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-hover: var(--brand-navy-hover);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
 
-  --color-brand-navy: #1C2B4A;           /* Alias explicite — Navy logo */
-  --color-brand-navy-hover: #142038;     /* Navy profond au hover */
-  --color-brand-gold: #C9A035;           /* Alias explicite — Or logo */
-  --color-brand-gold-light: #FEF3CD;     /* Teinte or claire (badges, fonds) */
-
-  --color-brand-secondary: #1C2B4A;      /* Navy comme secondaire */
-  --color-brand-secondary-hover: #142038;
+  --color-brand-secondary: var(--brand-navy);
+  --color-brand-secondary-hover: var(--brand-navy-hover);
 
   --color-brand-success: #16A34A;
   --color-brand-warning: #CA8A04;
   --color-brand-error: #DC2626;
-}
-
-:root {
-  --background: #F8F8F6;
-  --foreground: #1C2B4A;
 }
 
 body {
@@ -41,6 +75,45 @@ body {
   color: var(--foreground);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* =============================================
+   DARK MODE OVERRIDES & HARMONISATIONS
+   ============================================= */
+.dark .bg-white {
+  background-color: #161A23 !important;
+}
+.dark .bg-white\/90,
+.dark .bg-white\/95 {
+  background-color: rgba(22, 26, 35, 0.92) !important;
+}
+.dark .bg-\[\#FFFFFF\] {
+  background-color: #131720 !important;
+}
+.dark .bg-\[\#F5F5F3\] {
+  background-color: #0A0C12 !important;
+}
+.dark .text-\[\#1C2B4A\] {
+  color: #F1F3F5 !important;
+}
+.dark .text-\[\#6B7A94\],
+.dark .text-\[\#94A3B8\] {
+  color: #8E99AF !important;
+}
+.dark .border-\[\#E2E8F0\] {
+  border-color: #262D3D !important;
+}
+.dark input:not([type="checkbox"]),
+.dark select,
+.dark textarea {
+  background-color: #161A23;
+  color: #F1F3F5;
+  border-color: #262D3D;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #626D84;
 }
 
 /* =============================================
