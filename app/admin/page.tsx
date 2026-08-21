@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, ArrowRight, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { loginAdmin } from '@/services/auth';
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('admin@cap-aventure.fr');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function AdminLogin() {
               Adresse Email
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted pointer-events-none">
                 <Mail className="w-4.5 h-4.5" />
               </span>
               <input
@@ -114,21 +115,31 @@ export default function AdminLogin() {
               Mot de passe
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted pointer-events-none">
                 <Lock className="w-4.5 h-4.5" />
               </span>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-11 pr-4 py-3 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent text-sm"
+                className="w-full pl-11 pr-11 py-3 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent text-sm"
               />
-            </div>
-            <div className="mt-1 flex justify-end">
-              <span className="text-[10px] text-brand-muted">Démo: admin@123</span>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-brand-muted hover:text-brand-navy transition-colors cursor-pointer focus:outline-none focus:text-brand-navy"
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                title={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4.5 h-4.5" />
+                ) : (
+                  <Eye className="w-4.5 h-4.5" />
+                )}
+              </button>
             </div>
           </div>
 

@@ -167,14 +167,14 @@ export default function PublicLayout({
               Itinéraires incontournables, astuces de vanlifers chevronnés, témoignages de la communauté… Tout ce dont vous avez besoin pour préparer le road trip de vos rêves.
             </p>
             {/* Polaroid stack decoration */}
-            <div className="relative h-44 w-80 mt-2">
-              <div className="absolute top-0 left-0 w-32 h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[-6deg] z-10">
+            <div className="relative h-44 w-full max-w-xs mt-2 overflow-hidden sm:overflow-visible">
+              <div className="absolute top-0 left-0 w-28 sm:w-32 h-32 sm:h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[-6deg] z-10">
                 <img src="https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=200&q=80" alt="Blog 1" className="w-full h-full object-cover" />
               </div>
-              <div className="absolute top-2 left-20 w-32 h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[2deg] z-20">
+              <div className="absolute top-2 left-16 sm:left-20 w-28 sm:w-32 h-32 sm:h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[2deg] z-20">
                 <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=200&q=80" alt="Blog 2" className="w-full h-full object-cover" />
               </div>
-              <div className="absolute top-0 left-40 w-32 h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[7deg] z-30">
+              <div className="absolute top-0 left-32 sm:left-40 w-28 sm:w-32 h-32 sm:h-36 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden rotate-[7deg] z-30">
                 <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=200&q=80" alt="Blog 3" className="w-full h-full object-cover" />
               </div>
             </div>

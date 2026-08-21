@@ -78,7 +78,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 stagger-children">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 stagger-children">
         <StatsCard 
           title="Flotte Véhicules" 
           value={totalVehicles} 
@@ -135,7 +135,7 @@ export default function Dashboard() {
           ) : (
             <div className="divide-y divide-brand-border">
               {reservations.slice(0, 5).map((r) => (
-                <div key={r.id} className="py-4 flex justify-between items-center hover:bg-brand-hover/40 px-2 rounded-xl transition-all duration-200">
+                <div key={r.id} className="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-brand-hover/40 px-2 rounded-xl transition-all duration-200">
                   <div className="space-y-1">
                     <p className="font-bold text-brand-text text-sm">
                       {r.clientName}
@@ -144,7 +144,7 @@ export default function Dashboard() {
                       {r.vehicleName} • Du {new Date(r.startDate).toLocaleDateString('fr-FR')} au {new Date(r.endDate).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 self-end sm:self-auto">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                       r.status === 'EN_ATTENTE' ? 'bg-[#CA8A04]/10 text-[#CA8A04]' :
                       r.status === 'CONFIRMEE' ? 'bg-[#16A34A]/10 text-[#16A34A]' :
