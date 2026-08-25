@@ -113,10 +113,7 @@ function saveStoredVehicles(list: Vehicle[]) {
   }
 }
 
-let inMemoryVehicles: Vehicle[] = getStoredVehicles();
-let inMemoryReservations: Reservation[] = getStoredReservations();
-
-let inMemoryClients: Client[] = [
+const initialClientsList: Client[] = [
   {
     id: 'cli-01',
     firstName: 'Maxime',
@@ -142,6 +139,31 @@ let inMemoryClients: Client[] = [
     drivingLicenseNumber: '45EF89012'
   }
 ];
+
+function getStoredClients(): Client[] {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('cap_aventure_clients');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+  }
+  return initialClientsList;
+}
+
+function saveStoredClients(list: Client[]) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('cap_aventure_clients', JSON.stringify(list));
+    } catch (e) {}
+  }
+}
+
+let inMemoryVehicles: Vehicle[] = getStoredVehicles();
+let inMemoryReservations: Reservation[] = getStoredReservations();
+let inMemoryClients: Client[] = getStoredClients();
 
 export const MOCK_VEHICLES: Vehicle[] = inMemoryVehicles;
 
@@ -349,7 +371,16 @@ export async function createReservation(
     status: reservationInput.status || 'EN_ATTENTE'
   };
 
-  inMemoryClients.unshift(newClient);
+  const currentClients = getStoredClients();
+  const existingIdx = currentClients.findIndex(c => c.email.toLowerCase() === clientInput.email.toLowerCase());
+  if (existingIdx >= 0) {
+    currentClients[existingIdx] = { ...currentClients[existingIdx], ...clientInput };
+  } else {
+    currentClients.unshift(newClient);
+  }
+  inMemoryClients = currentClients;
+  saveStoredClients(inMemoryClients);
+
   inMemoryReservations.unshift(newReservation);
   saveStoredReservations(inMemoryReservations);
 
@@ -481,9 +512,10 @@ export async function updateLatestReservationStatus(status: ReservationStatus): 
 }
 
 export async function getClients(): Promise<Client[]> {
+  const storedClients = getStoredClients();
   try {
     if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
-      return [...inMemoryClients];
+      return storedClients;
     }
     const q = query(collection(db, 'clients'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
@@ -499,8 +531,8 @@ export async function getClients(): Promise<Client[]> {
         drivingLicenseNumber: data.drivingLicenseNumber || '',
       });
     });
-    return list.length > 0 ? list : [...inMemoryClients];
+    return list.length > 0 ? list : storedClients;
   } catch (error) {
-    return [...inMemoryClients];
+    return storedClients;
   }
 }
