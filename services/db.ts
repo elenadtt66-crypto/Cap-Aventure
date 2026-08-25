@@ -88,7 +88,32 @@ function saveStoredReservations(list: Reservation[]) {
   }
 }
 
-let inMemoryVehicles: Vehicle[] = [...(cleanVehiclesDataset as Vehicle[])];
+function getStoredVehicles(): Vehicle[] {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('cap_aventure_vehicles');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error('Error parsing stored vehicles:', e);
+      }
+    }
+  }
+  return [...(cleanVehiclesDataset as Vehicle[])];
+}
+
+function saveStoredVehicles(list: Vehicle[]) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('cap_aventure_vehicles', JSON.stringify(list));
+    } catch (e) {
+      console.warn('LocalStorage quota exceeded or unavailable when saving vehicles:', e);
+    }
+  }
+}
+
+let inMemoryVehicles: Vehicle[] = getStoredVehicles();
 let inMemoryReservations: Reservation[] = getStoredReservations();
 
 let inMemoryClients: Client[] = [
@@ -127,7 +152,7 @@ export const MOCK_VEHICLES: Vehicle[] = inMemoryVehicles;
 export async function getVehicles(): Promise<Vehicle[]> {
   try {
     if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
-      return [...inMemoryVehicles];
+      return getStoredVehicles();
     }
     const q = query(collection(db, 'vehicles'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
@@ -166,16 +191,17 @@ export async function getVehicles(): Promise<Vehicle[]> {
     });
     
     if (list.length === 0) {
-      return [...inMemoryVehicles];
+      return getStoredVehicles();
     }
     return list;
   } catch (error) {
-    return [...inMemoryVehicles];
+    return getStoredVehicles();
   }
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   const cleanSlug = decodeURIComponent(slug || '').trim().toLowerCase();
+  const storedVehicles = getStoredVehicles();
 
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
@@ -221,7 +247,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
     }
 
     // Recherche robuste dans le jeu de données dédupliqué
-    const found = inMemoryVehicles.find(
+    const found = storedVehicles.find(
       v => v.slug.toLowerCase() === cleanSlug || 
            v.id.toLowerCase() === cleanSlug ||
            v.slug.toLowerCase().includes(cleanSlug) ||
@@ -230,7 +256,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
 
     return found || null;
   } catch (error) {
-    const found = inMemoryVehicles.find(
+    const found = storedVehicles.find(
       v => v.slug.toLowerCase() === cleanSlug || 
            v.id.toLowerCase() === cleanSlug
     );
@@ -245,8 +271,10 @@ export async function addVehicle(vehicle: Omit<Vehicle, 'id'>): Promise<string> 
     id: generatedId,
   };
 
-  // Ajout en mémoire
-  inMemoryVehicles = [newVehicle, ...inMemoryVehicles];
+  // Enregistrement local persistent
+  const currentVehicles = getStoredVehicles();
+  inMemoryVehicles = [newVehicle, ...currentVehicles];
+  saveStoredVehicles(inMemoryVehicles);
 
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
@@ -257,20 +285,21 @@ export async function addVehicle(vehicle: Omit<Vehicle, 'id'>): Promise<string> 
       return docRef.id;
     }
   } catch (err) {
-    console.warn('Fallback: saved in memory');
+    console.warn('Fallback: saved in localStorage');
   }
 
   return generatedId;
 }
 
 export async function updateVehicle(id: string, updatedFields: Partial<Vehicle>): Promise<void> {
-  // Mise à jour en mémoire
-  inMemoryVehicles = inMemoryVehicles.map(v => {
+  const currentVehicles = getStoredVehicles();
+  inMemoryVehicles = currentVehicles.map(v => {
     if (v.id === id) {
       return { ...v, ...updatedFields };
     }
     return v;
   });
+  saveStoredVehicles(inMemoryVehicles);
 
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
@@ -278,13 +307,14 @@ export async function updateVehicle(id: string, updatedFields: Partial<Vehicle>)
       await updateDoc(docRef, updatedFields);
     }
   } catch (err) {
-    console.warn('Fallback: updated in memory');
+    console.warn('Fallback: updated in localStorage');
   }
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
-  // Suppression en mémoire
-  inMemoryVehicles = inMemoryVehicles.filter(v => v.id !== id);
+  const currentVehicles = getStoredVehicles();
+  inMemoryVehicles = currentVehicles.filter(v => v.id !== id);
+  saveStoredVehicles(inMemoryVehicles);
 
   try {
     if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
@@ -292,7 +322,7 @@ export async function deleteVehicle(id: string): Promise<void> {
       await deleteDoc(docRef);
     }
   } catch (err) {
-    console.warn('Fallback: deleted from memory');
+    console.warn('Fallback: deleted from localStorage');
   }
 }
 

@@ -61,7 +61,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
     onChange([target, ...rest]);
   };
 
-  // Gestion des fichiers locaux (Upload / Drag & Drop)
+  // Gestion des fichiers locaux (Upload / Drag & Drop) avec compression automatique
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
@@ -70,9 +70,41 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        if (result && !images.includes(result)) {
+        if (!result) return;
+
+        // Compression via Canvas pour réduire l'empreinte mémoire
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.8);
+            onChange([...images, compressed]);
+          } else {
+            onChange([...images, result]);
+          }
+        };
+        img.onerror = () => {
           onChange([...images, result]);
-        }
+        };
+        img.src = result;
       };
       reader.readAsDataURL(file);
     });

@@ -155,8 +155,18 @@ export default function AdminVehicles() {
     setFormError('');
     setSubmitting(true);
 
-    if (!formData.name || !formData.slug) {
-      setFormError('Le nom et le slug sont obligatoires.');
+    let finalSlug = (formData.slug || '').trim();
+    if (!finalSlug && formData.name) {
+      finalSlug = formData.name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+    }
+
+    if (!formData.name || !finalSlug) {
+      setFormError('Le nom du véhicule est obligatoire.');
       setSubmitting(false);
       return;
     }
@@ -177,7 +187,7 @@ export default function AdminVehicles() {
         const existingVeh = vehicles.find(v => v.id === editingId);
         const updatePayload: Partial<Vehicle> = {
           name: formData.name,
-          slug: formData.slug,
+          slug: finalSlug,
           type: formData.type,
           location: formData.location,
           description: formData.description,
@@ -207,7 +217,7 @@ export default function AdminVehicles() {
       } else {
         const newPayload: Omit<Vehicle, 'id'> = {
           name: formData.name,
-          slug: formData.slug,
+          slug: finalSlug,
           type: formData.type,
           location: formData.location,
           description: formData.description,
