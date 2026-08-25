@@ -65,7 +65,7 @@ export default function SelectMenu({
         onClick={() => !disabled && setOpen(!open)}
         disabled={disabled}
         className={`
-          w-full max-w-full flex items-center justify-between gap-2.5 bg-white border font-bold text-brand-text
+          w-full max-w-full flex items-center justify-between gap-2.5 bg-brand-card border font-bold text-brand-text
           transition-all duration-200 cursor-pointer select-none text-left overflow-hidden
           ${sizeStyles[size]}
           ${open 
@@ -97,7 +97,7 @@ export default function SelectMenu({
         <div
           className="
             absolute z-50 top-full mt-1.5 min-w-[220px] w-full left-0
-            bg-white/98 backdrop-blur-md border border-brand-border
+            bg-brand-card/98 backdrop-blur-md border border-brand-border
             rounded-2xl shadow-xl p-1.5 space-y-1 animate-scale-up max-h-64 overflow-y-auto
           "
         >

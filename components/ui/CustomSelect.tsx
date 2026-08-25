@@ -98,10 +98,10 @@ export default function CustomSelect({
         aria-expanded={open}
         className={`
           relative w-full flex items-center justify-between
-          px-5 py-3.5 bg-white rounded-2xl text-xs font-semibold
+          px-5 py-3.5 bg-brand-card rounded-2xl text-xs font-semibold
           border-2 transition-all duration-200 cursor-pointer text-left
           ${open
-            ? 'border-brand-accent ring-4 ring-brand-accent/10 shadow-md bg-white'
+            ? 'border-brand-accent ring-4 ring-brand-accent/10 shadow-md bg-brand-card'
             : 'border-brand-border hover:border-brand-accent/40 shadow-sm hover:shadow-md'
           }
           ${disabled ? 'opacity-50 cursor-not-allowed bg-brand-beige' : ''}
@@ -146,7 +146,7 @@ export default function CustomSelect({
           role="listbox"
           className="
             absolute z-50 top-full mt-2 left-0 right-0
-            bg-white/95 backdrop-blur-md border border-brand-border/60
+            bg-brand-card/95 backdrop-blur-md border border-brand-border/60
             rounded-2xl shadow-xl shadow-black/5
             overflow-hidden animate-scale-up
           "

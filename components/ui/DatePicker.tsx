@@ -221,7 +221,7 @@ export default function DatePicker({
           w-full flex items-center justify-between px-4 py-3 bg-brand-beige border rounded-2xl
           text-xs font-semibold transition-all duration-200 cursor-pointer text-left select-none
           ${isOpen 
-            ? 'border-brand-accent ring-2 ring-brand-accent/20 bg-white shadow-md' 
+            ? 'border-brand-accent ring-2 ring-brand-accent/20 bg-brand-card shadow-md' 
             : 'border-brand-border hover:border-brand-accent/40 shadow-2xs hover:bg-brand-hover'
           }
         `}
@@ -252,7 +252,7 @@ export default function DatePicker({
         <div
           className="
             absolute z-50 top-full mt-2 left-0 sm:right-auto min-w-[300px] sm:w-[320px]
-            bg-white/98 backdrop-blur-md border border-brand-border
+            bg-brand-card/98 backdrop-blur-md border border-brand-border
             rounded-3xl shadow-2xl p-4 space-y-4 animate-scale-up
           "
         >
