@@ -61,52 +61,58 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
     onChange([target, ...rest]);
   };
 
-  // Gestion des fichiers locaux (Upload / Drag & Drop) avec compression automatique
+  // Gestion des fichiers locaux (Upload / Drag & Drop) avec compression haute performance et basse consommation mémoire
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (!result) return;
 
-        // Compression via Canvas pour réduire l'empreinte mémoire
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const maxDim = 1200;
-          let width = img.width;
-          let height = img.height;
+      // Utilisation d'un Object URL léger au lieu de charger immédiatement en base64 brute
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1000; // Dimension optimale pour l'affichage mobile/bureau sans lourdeur
+        let width = img.width;
+        let height = img.height;
 
-          if (width > maxDim || height > maxDim) {
-            if (width > height) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            } else {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.8);
-            onChange([...images, compressed]);
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
           } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          onChange([...images, compressed]);
+        }
+        URL.revokeObjectURL(objectUrl);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        // Fallback de secours si createObjectURL échoue
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          if (result) {
             onChange([...images, result]);
           }
         };
-        img.onerror = () => {
-          onChange([...images, result]);
-        };
-        img.src = result;
+        reader.readAsDataURL(file);
       };
-      reader.readAsDataURL(file);
+
+      img.src = objectUrl;
     });
   };
 
