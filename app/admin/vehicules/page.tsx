@@ -246,6 +246,15 @@ export default function AdminVehicles() {
         await addVehicle(newPayload);
       }
       setIsFormOpen(false);
+      // Libérer la mémoire (les images en base64) pour éviter les crashs sur mobile
+      setFormData(prev => ({
+        ...prev,
+        name: '',
+        slug: '',
+        description: '',
+        featuresInput: '',
+        images: [],
+      }));
       await loadVehicles();
     } catch (err) {
       console.error(err);
@@ -283,9 +292,10 @@ export default function AdminVehicles() {
 
   // Filtrage
   const filteredVehicles = vehicles.filter((v) => {
-    const matchesSearch = v.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          v.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          v.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLow = (searchTerm || '').toLowerCase();
+    const matchesSearch = (v.name || '').toLowerCase().includes(searchLow) || 
+                          (v.description || '').toLowerCase().includes(searchLow) ||
+                          (v.location || '').toLowerCase().includes(searchLow);
     const matchesType = selectedTypeFilter === 'ALL' || v.type === selectedTypeFilter;
     return matchesSearch && matchesType;
   });

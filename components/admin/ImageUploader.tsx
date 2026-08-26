@@ -75,7 +75,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxDim = 800; // Dimension optimale pour l'affichage et l'allègement (évite la limite Firestore 1MB)
+          const maxDim = 600; // Dimension optimale et très légère pour Firestore et Mobile
           let width = img.width;
           let height = img.height;
 
@@ -94,7 +94,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.6); // Compression optimisée
+            const compressed = canvas.toDataURL('image/jpeg', 0.5); // Compression max
             resolve(compressed);
           } else {
             resolve('');
@@ -119,8 +119,14 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
     };
 
     try {
-      const newImages = await Promise.all(fileArray.map(processImage));
-      const validImages = newImages.filter(img => img.length > 0);
+      const validImages: string[] = [];
+      // Traitement séquentiel pour éviter le plantage (Out of Memory) sur mobile
+      for (const file of fileArray) {
+        const imgBase64 = await processImage(file);
+        if (imgBase64.length > 0) {
+          validImages.push(imgBase64);
+        }
+      }
       if (validImages.length > 0) {
         onChange([...images, ...validImages]);
       }
