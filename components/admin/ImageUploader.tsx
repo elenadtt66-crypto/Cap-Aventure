@@ -62,58 +62,71 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
   };
 
   // Gestion des fichiers locaux (Upload / Drag & Drop) avec compression haute performance et basse consommation mémoire
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
+    const fileArray = Array.from(files).filter(file => file.type.startsWith('image/'));
+    if (fileArray.length === 0) return;
 
-      // Utilisation d'un Object URL léger au lieu de charger immédiatement en base64 brute
-      const objectUrl = URL.createObjectURL(file);
-      const img = new Image();
-      
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 1000; // Dimension optimale pour l'affichage mobile/bureau sans lourdeur
-        let width = img.width;
-        let height = img.height;
+    const processImage = (file: File): Promise<string> => {
+      return new Promise((resolve) => {
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800; // Dimension optimale pour l'affichage et l'allègement (évite la limite Firestore 1MB)
+          let width = img.width;
+          let height = img.height;
 
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.6); // Compression optimisée
+            resolve(compressed);
           } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
+            resolve('');
           }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.7);
-          onChange([...images, compressed]);
-        }
-        URL.revokeObjectURL(objectUrl);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        // Fallback de secours si createObjectURL échoue
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const result = e.target?.result as string;
-          if (result) {
-            onChange([...images, result]);
-          }
+          URL.revokeObjectURL(objectUrl);
         };
-        reader.readAsDataURL(file);
-      };
 
-      img.src = objectUrl;
-    });
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          // Fallback de secours si createObjectURL échoue
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const result = e.target?.result as string;
+            resolve(result || '');
+          };
+          reader.onerror = () => resolve('');
+          reader.readAsDataURL(file);
+        };
+
+        img.src = objectUrl;
+      });
+    };
+
+    try {
+      const newImages = await Promise.all(fileArray.map(processImage));
+      const validImages = newImages.filter(img => img.length > 0);
+      if (validImages.length > 0) {
+        onChange([...images, ...validImages]);
+      }
+    } catch (err) {
+      console.error("Erreur lors du traitement des images", err);
+    }
   };
 
   const handleDrag = (e: React.DragEvent) => {
