@@ -75,7 +75,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxDim = 600; // Dimension optimale et très légère pour Firestore et Mobile
+          const maxDim = 450; // Ultra léger pour Supabase et réseau mobile 3G/4G
           let width = img.width;
           let height = img.height;
 
@@ -94,7 +94,8 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.5); // Compression max
+            // Compression aggressive (0.35) : ~30-40 Ko par photo pour éviter les erreurs HTTP 413 ou QuotaExceeded
+            const compressed = canvas.toDataURL('image/jpeg', 0.35);
             resolve(compressed);
           } else {
             resolve('');
