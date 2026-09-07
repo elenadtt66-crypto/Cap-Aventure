@@ -9,7 +9,8 @@ import {
   RefreshCw,
   TrendingUp,
   User,
-  ArrowRight
+  ArrowRight,
+  Plus
 } from 'lucide-react';
 import StatsCard from '@/components/admin/StatsCard';
 import { getVehicles, getReservations } from '@/services/db';
@@ -59,7 +60,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0ms' }}>
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-brand-text tracking-tight">
             Vue d'ensemble
@@ -68,13 +69,22 @@ export default function Dashboard() {
             Indicateurs clés d'activité de l'agence Cap Aventure.
           </p>
         </div>
-        <button
-          onClick={loadData}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-brand-border rounded-xl text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer"
-        >
-          <RefreshCw className="w-4 h-4" />
-          <span>Actualiser</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadData}
+            className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-brand-border rounded-xl text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer shadow-sm"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Actualiser</span>
+          </button>
+          <Link
+            href="/admin/vehicules"
+            className="flex items-center space-x-2 px-5 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-sm font-bold shadow-md transition-all duration-200 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nouveau Véhicule</span>
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards Grid */}
