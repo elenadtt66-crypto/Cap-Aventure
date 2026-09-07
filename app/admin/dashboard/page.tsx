@@ -197,6 +197,83 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Recent Vehicles Section */}
+      <div className="bg-white border border-brand-border rounded-2xl p-6 space-y-6 shadow-sm">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-bold text-brand-text flex items-center gap-2">
+              <span>Derniers véhicules ajoutés</span>
+              <span className="px-2 py-0.5 bg-brand-accent/10 text-brand-accent rounded-full text-[11px] font-extrabold">
+                {totalVehicles} au total
+              </span>
+            </h2>
+            <p className="text-xs text-brand-muted mt-0.5">
+              Aperçu des derniers véhicules enregistrés dans votre flotte.
+            </p>
+          </div>
+          <Link 
+            href="/admin/vehicules" 
+            className="text-xs font-bold text-brand-accent hover:underline flex items-center space-x-1"
+          >
+            <span>Toute la flotte</span>
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="h-44 bg-brand-hover rounded-2xl animate-pulse"></div>
+            <div className="h-44 bg-brand-hover rounded-2xl animate-pulse"></div>
+            <div className="h-44 bg-brand-hover rounded-2xl animate-pulse"></div>
+            <div className="h-44 bg-brand-hover rounded-2xl animate-pulse"></div>
+          </div>
+        ) : vehicles.length === 0 ? (
+          <p className="text-xs text-brand-muted py-8 text-center bg-brand-beige/20 rounded-xl border border-dashed border-brand-border">
+            Aucun véhicule enregistré dans le catalogue.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {vehicles.slice(0, 4).map((veh) => (
+              <div 
+                key={veh.id}
+                className="group border border-brand-border rounded-2xl overflow-hidden bg-brand-beige/30 hover:bg-white hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+              >
+                <div className="relative h-32 overflow-hidden bg-brand-hover">
+                  <img 
+                    src={veh.images?.[0] || 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=600&q=80'} 
+                    alt={veh.name} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-brand-navy font-mono shadow-sm">
+                    {veh.pricePerDay}€ <span className="text-[9px] font-normal text-brand-muted">/j</span>
+                  </div>
+                </div>
+                <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-brand-text text-xs line-clamp-1 group-hover:text-brand-accent transition-colors">
+                      {veh.name}
+                    </h3>
+                    <p className="text-[11px] text-brand-muted font-medium mt-0.5">
+                      {veh.location || 'Bordeaux'}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-brand-border/60 text-[10px]">
+                    <span className="text-brand-muted font-semibold">
+                      {veh.seats} pl. • {veh.beds} couch.
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full font-bold ${
+                      veh.available ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                    }`}>
+                      {veh.available ? 'Actif' : 'Masqué'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
