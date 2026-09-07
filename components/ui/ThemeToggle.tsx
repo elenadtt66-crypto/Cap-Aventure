@@ -55,18 +55,20 @@ export default function ThemeToggle({ className = '', variant = 'icon' }: ThemeT
       <button
         type="button"
         onClick={toggleTheme}
-        className={`flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl text-xs font-bold border border-brand-border bg-brand-card hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer ${className}`}
+        className={`flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl text-xs font-bold border border-brand-border bg-brand-card hover:bg-brand-hover text-brand-text transition-all duration-300 cursor-pointer shadow-xs active:scale-[0.98] ${className}`}
         aria-label={`Activer le mode ${isDark ? 'clair' : 'sombre'}`}
       >
-        <span className="flex items-center gap-2">
-          {isDark ? (
-            <Moon className="w-4 h-4 text-brand-accent animate-scale-up" />
-          ) : (
-            <Sun className="w-4 h-4 text-brand-accent animate-scale-up" />
-          )}
+        <span className="flex items-center gap-2.5">
+          <span className="p-1 rounded-lg bg-brand-hover border border-brand-border/60 text-brand-accent transition-transform duration-300 group-hover:rotate-12">
+            {isDark ? (
+              <Moon className="w-3.5 h-3.5 text-brand-accent animate-scale-up" />
+            ) : (
+              <Sun className="w-3.5 h-3.5 text-brand-accent animate-scale-up" />
+            )}
+          </span>
           <span>Mode {isDark ? 'Sombre' : 'Clair'}</span>
         </span>
-        <span className="text-[10px] uppercase tracking-wider text-brand-muted font-mono bg-brand-hover px-2 py-0.5 rounded-md border border-brand-border">
+        <span className="text-[10px] uppercase tracking-wider text-brand-accent font-mono bg-brand-accent/10 px-2 py-0.5 rounded-md border border-brand-accent/20 font-bold">
           {isDark ? 'Nuit' : 'Jour'}
         </span>
       </button>
@@ -77,11 +79,11 @@ export default function ThemeToggle({ className = '', variant = 'icon' }: ThemeT
     <button
       type="button"
       onClick={toggleTheme}
-      className={`relative w-9 h-9 rounded-xl flex items-center justify-center border border-brand-border bg-brand-card hover:bg-brand-hover text-brand-text transition-all duration-200 shadow-sm hover:scale-105 active:scale-95 cursor-pointer group ${className}`}
+      className={`relative w-9 h-9 rounded-xl flex items-center justify-center border border-brand-border bg-brand-card hover:bg-brand-hover text-brand-text transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 cursor-pointer group hover:border-brand-accent/40 ${className}`}
       aria-label={`Activer le mode ${isDark ? 'clair' : 'sombre'}`}
       title={`Passer en mode ${isDark ? 'clair' : 'sombre'}`}
     >
-      <div className="relative w-4 h-4 flex items-center justify-center">
+      <div className="relative w-4 h-4 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12">
         {isDark ? (
           <Moon className="w-4 h-4 text-brand-accent animate-scale-up" />
         ) : (

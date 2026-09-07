@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F8F8F6;
-  --foreground: #1C2B4A;
+  --background: #FAFBFC;
+  --foreground: #111827;
 
-  --brand-beige: #F8F8F6;
+  --brand-beige: #FAFBFC;
   --brand-card: #FFFFFF;
-  --brand-hover: #F2F2F0;
-  --brand-border: #E8E8E4;
+  --brand-hover: #F3F4F6;
+  --brand-border: #E5E7EB;
 
-  --brand-text: #1C2B4A;
-  --brand-muted: #6B7A94;
+  --brand-text: #111827;
+  --brand-muted: #6B7280;
 
   --brand-accent: #C9A035;
   --brand-accent-hover: #A8832A;
@@ -22,24 +22,24 @@
 }
 
 .dark {
-  --background: #0B0E14;
-  --foreground: #F1F3F5;
+  --background: #090B10;
+  --foreground: #F3F4F6;
 
-  --brand-beige: #0B0E14;
-  --brand-card: #161A23;
-  --brand-hover: #222836;
-  --brand-border: #262D3D;
+  --brand-beige: #090B10;
+  --brand-card: #141822;
+  --brand-hover: #1F2636;
+  --brand-border: #2A3346;
 
-  --brand-text: #F1F3F5;
-  --brand-muted: #8E99AF;
+  --brand-text: #F3F4F6;
+  --brand-muted: #9CA3AF;
 
   --brand-accent: #E5B842;
   --brand-accent-hover: #F5C953;
 
-  --brand-navy: #1A2234;
-  --brand-navy-hover: #242F46;
+  --brand-navy: #1E283D;
+  --brand-navy-hover: #293652;
   --brand-gold: #E5B842;
-  --brand-gold-light: #2B2414;
+  --brand-gold-light: #2E2714;
 }
 
 @theme {
@@ -65,9 +65,9 @@
   --color-brand-secondary: var(--brand-navy);
   --color-brand-secondary-hover: var(--brand-navy-hover);
 
-  --color-brand-success: #16A34A;
-  --color-brand-warning: #CA8A04;
-  --color-brand-error: #DC2626;
+  --color-brand-success: #10B981;
+  --color-brand-warning: #F59E0B;
+  --color-brand-error: #EF4444;
 }
 
 body {
@@ -75,45 +75,45 @@ body {
   color: var(--foreground);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* =============================================
    DARK MODE OVERRIDES & HARMONISATIONS
    ============================================= */
 .dark .bg-white {
-  background-color: #161A23 !important;
+  background-color: #141822 !important;
 }
 .dark .bg-white\/90,
 .dark .bg-white\/95 {
-  background-color: rgba(22, 26, 35, 0.92) !important;
+  background-color: rgba(20, 24, 34, 0.94) !important;
 }
 .dark .bg-\[\#FFFFFF\] {
-  background-color: #131720 !important;
+  background-color: #141822 !important;
 }
 .dark .bg-\[\#F5F5F3\] {
-  background-color: #0A0C12 !important;
+  background-color: #0E121B !important;
 }
 .dark .text-\[\#1C2B4A\] {
-  color: #F1F3F5 !important;
+  color: #F3F4F6 !important;
 }
 .dark .text-\[\#6B7A94\],
 .dark .text-\[\#94A3B8\] {
-  color: #8E99AF !important;
+  color: #9CA3AF !important;
 }
 .dark .border-\[\#E2E8F0\] {
-  border-color: #262D3D !important;
+  border-color: #2A3346 !important;
 }
 .dark input:not([type="checkbox"]),
 .dark select,
 .dark textarea {
-  background-color: #161A23;
-  color: #F1F3F5;
-  border-color: #262D3D;
+  background-color: #141822;
+  color: #F3F4F6;
+  border-color: #2A3346;
 }
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #626D84;
+  color: #6B7280;
 }
 
 /* =============================================

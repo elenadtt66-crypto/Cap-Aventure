@@ -43,7 +43,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   };
 
   const navContent = (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-brand-card">
       {/* Logo & Mobile Close */}
       <div className="p-5 border-b border-brand-border flex items-center justify-between">
         <Link href="/" onClick={onClose} aria-label="Cap Aventure — Accueil">
@@ -134,7 +134,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           />
 
           {/* Drawer Content */}
-          <div className="relative flex-1 max-w-xs w-full bg-white h-full shadow-2xl z-10 animate-slide-in-right">
+          <div className="relative flex-1 max-w-xs w-full bg-brand-card h-full shadow-2xl z-10 animate-slide-in-right">
             {navContent}
           </div>
         </div>
