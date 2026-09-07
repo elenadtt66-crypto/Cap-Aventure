@@ -62,24 +62,24 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-brand-text tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-text tracking-tight">
             Vue d'ensemble
           </h1>
-          <p className="text-sm text-brand-muted mt-1">
+          <p className="text-xs sm:text-sm text-brand-muted mt-1">
             Indicateurs clés d'activité de l'agence Cap Aventure.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={loadData}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-brand-border rounded-xl text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer shadow-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center space-x-2 px-4 py-2.5 bg-white border border-brand-border rounded-xl text-xs sm:text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer shadow-sm"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Actualiser</span>
           </button>
           <Link
             href="/admin/vehicules"
-            className="flex items-center space-x-2 px-5 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-sm font-bold shadow-md transition-all duration-200 cursor-pointer"
+            className="flex-1 sm:flex-none flex items-center justify-center space-x-2 px-4 sm:px-5 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition-all duration-200 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Nouveau Véhicule</span>
@@ -87,8 +87,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 stagger-children">
+      {/* Stats Cards Grid (2 cols on mobile, 4 on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 stagger-children">
         <StatsCard 
           title="Flotte Véhicules" 
           value={totalVehicles} 
@@ -111,7 +111,7 @@ export default function Dashboard() {
           colorClass="bg-[#16A34A]/10 text-[#16A34A]"
         />
         <StatsCard 
-          title="Chiffre d'Affaires (€)" 
+          title="Chiffre d'Affaires" 
           value={estimatedCA} 
           icon={BadgeEuro} 
           loading={loading}
@@ -120,11 +120,11 @@ export default function Dashboard() {
       </div>
 
       {/* Recent reservations & Quick stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Latest Activity list (2 cols wide) */}
-        <div className="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 space-y-4 shadow-sm">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-brand-text">Dernières demandes de réservation</h2>
+            <h2 className="text-base sm:text-lg font-bold text-brand-text">Dernières demandes de réservation</h2>
             <Link 
               href="/admin/reservations" 
               className="text-xs font-bold text-brand-accent hover:underline flex items-center space-x-1"
@@ -145,16 +145,16 @@ export default function Dashboard() {
           ) : (
             <div className="divide-y divide-brand-border">
               {reservations.slice(0, 5).map((r) => (
-                <div key={r.id} className="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-brand-hover/40 px-2 rounded-xl transition-all duration-200">
-                  <div className="space-y-1">
-                    <p className="font-bold text-brand-text text-sm">
+                <div key={r.id} className="py-3.5 sm:py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 hover:bg-brand-hover/40 px-2 rounded-xl transition-all duration-200">
+                  <div className="space-y-1 min-w-0">
+                    <p className="font-bold text-brand-text text-sm truncate">
                       {r.clientName}
                     </p>
-                    <p className="text-xs text-brand-muted">
+                    <p className="text-xs text-brand-muted truncate">
                       {r.vehicleName} • Du {new Date(r.startDate).toLocaleDateString('fr-FR')} au {new Date(r.endDate).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-3 self-end sm:self-auto">
+                  <div className="flex items-center justify-between sm:justify-end space-x-3 w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-brand-border/40">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                       r.status === 'EN_ATTENTE' ? 'bg-[#CA8A04]/10 text-[#CA8A04]' :
                       r.status === 'CONFIRMEE' ? 'bg-[#16A34A]/10 text-[#16A34A]' :

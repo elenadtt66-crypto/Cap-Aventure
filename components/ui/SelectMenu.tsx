@@ -96,7 +96,7 @@ export default function SelectMenu({
       {open && (
         <div
           className="
-            absolute z-50 top-full mt-1.5 min-w-[220px] w-full left-0
+            absolute z-50 top-full mt-1.5 min-w-[200px] w-full max-w-[calc(100vw-2rem)] left-0
             bg-brand-card/98 backdrop-blur-md border border-brand-border
             rounded-2xl shadow-xl p-1.5 space-y-1 animate-scale-up max-h-64 overflow-y-auto
           "

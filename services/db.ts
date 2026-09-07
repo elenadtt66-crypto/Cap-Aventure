@@ -253,62 +253,62 @@ export async function addVehicle(vehicle: Omit<Vehicle, 'id'>): Promise<string> 
     id: generatedId,
   };
 
-  // Enregistrement local persistent
+  // 1. Enregistrement local en mémoire et cache
   const currentVehicles = getStoredVehicles();
   inMemoryVehicles = [newVehicle, ...currentVehicles];
   saveStoredVehicles(inMemoryVehicles);
 
+  // 2. Synchronisation Supabase (SEULEMENT avec les colonnes existantes dans PostgreSQL)
   if (supabase) {
     try {
+      const payload = {
+        id: generatedId,
+        slug: vehicle.slug || '',
+        name: vehicle.name || '',
+        type: vehicle.type || 'van_amenege',
+        description: vehicle.description || '',
+        price_per_day: Number(vehicle.pricePerDay) || 0,
+        seats: Number(vehicle.seats) || 2,
+        beds: Number(vehicle.beds) || 2,
+        features: Array.isArray(vehicle.features) ? vehicle.features : [],
+        images: Array.isArray(vehicle.images) ? vehicle.images : [],
+        available: vehicle.available !== false,
+        location: vehicle.location || 'Bordeaux',
+        owner: vehicle.owner || {
+          name: 'Cap Aventure Agence',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+          responseTime: 'En moins d\'une heure',
+          responseRate: 100
+        },
+        tech_specs: vehicle.techSpecs || {
+          fuel: 'Diesel',
+          transmission: 'Manuelle',
+          consumption: '8L/100km',
+          enginePower: '130 ch'
+        },
+        rating: Number(vehicle.rating) || 5.0,
+        review_count: Number(vehicle.reviewCount) || 0,
+        reviews: Array.isArray(vehicle.reviews) ? vehicle.reviews : [],
+        created_at: new Date().toISOString()
+      };
+
       const { data, error } = await supabase
         .from('vehicles')
-        .insert([
-          {
-            id: generatedId,
-            slug: vehicle.slug,
-            name: vehicle.name,
-            type: vehicle.type,
-            description: vehicle.description,
-            price_per_day: vehicle.pricePerDay,
-            pricePerDay: vehicle.pricePerDay,
-            seats: vehicle.seats,
-            beds: vehicle.beds,
-            features: vehicle.features,
-            images: vehicle.images,
-            available: vehicle.available,
-            location: vehicle.location,
-            owner: vehicle.owner,
-            tech_specs: vehicle.techSpecs,
-            techSpecs: vehicle.techSpecs,
-            rating: vehicle.rating,
-            review_count: vehicle.reviewCount,
-            reviewCount: vehicle.reviewCount,
-            reviews: vehicle.reviews,
-            created_at: new Date().toISOString()
-          }
-        ])
+        .insert([payload])
         .select();
 
       if (error) {
-        console.warn('Supabase insert vehicle warning:', error);
-      } else if (data && data.length > 0) {
+        console.error('Supabase addVehicle error:', error);
+        throw new Error(error.message || 'Erreur lors de l\'enregistrement dans Supabase');
+      }
+
+      if (data && data.length > 0) {
         return data[0].id;
       }
-    } catch (err) {
-      console.warn('Supabase addVehicle error:', err);
+    } catch (err: any) {
+      console.error('Supabase addVehicle exception:', err);
+      throw err;
     }
-  }
-
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const docRef = await addDoc(collection(db, 'vehicles'), {
-        ...vehicle,
-        createdAt: serverTimestamp(),
-      });
-      return docRef.id;
-    }
-  } catch (err) {
-    console.warn('Fallback: saved in localStorage');
   }
 
   return generatedId;
@@ -326,32 +326,35 @@ export async function updateVehicle(id: string, updatedFields: Partial<Vehicle>)
 
   if (supabase) {
     try {
-      const payload: any = { ...updatedFields };
-      if (updatedFields.pricePerDay !== undefined) {
-        payload.price_per_day = updatedFields.pricePerDay;
-      }
-      if (updatedFields.techSpecs !== undefined) {
-        payload.tech_specs = updatedFields.techSpecs;
-      }
-      if (updatedFields.reviewCount !== undefined) {
-        payload.review_count = updatedFields.reviewCount;
-      }
-      await supabase
+      const payload: Record<string, any> = {};
+      if (updatedFields.name !== undefined) payload.name = updatedFields.name;
+      if (updatedFields.slug !== undefined) payload.slug = updatedFields.slug;
+      if (updatedFields.type !== undefined) payload.type = updatedFields.type;
+      if (updatedFields.description !== undefined) payload.description = updatedFields.description;
+      if (updatedFields.pricePerDay !== undefined) payload.price_per_day = Number(updatedFields.pricePerDay);
+      if (updatedFields.seats !== undefined) payload.seats = Number(updatedFields.seats);
+      if (updatedFields.beds !== undefined) payload.beds = Number(updatedFields.beds);
+      if (updatedFields.features !== undefined) payload.features = updatedFields.features;
+      if (updatedFields.images !== undefined) payload.images = updatedFields.images;
+      if (updatedFields.available !== undefined) payload.available = updatedFields.available;
+      if (updatedFields.location !== undefined) payload.location = updatedFields.location;
+      if (updatedFields.owner !== undefined) payload.owner = updatedFields.owner;
+      if (updatedFields.techSpecs !== undefined) payload.tech_specs = updatedFields.techSpecs;
+      if (updatedFields.rating !== undefined) payload.rating = updatedFields.rating;
+      if (updatedFields.reviewCount !== undefined) payload.review_count = updatedFields.reviewCount;
+      if (updatedFields.reviews !== undefined) payload.reviews = updatedFields.reviews;
+
+      const { error } = await supabase
         .from('vehicles')
         .update(payload)
         .eq('id', id);
-    } catch (err) {
-      console.warn('Supabase updateVehicle error:', err);
-    }
-  }
 
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const docRef = doc(db, 'vehicles', id);
-      await updateDoc(docRef, updatedFields);
+      if (error) {
+        console.error('Supabase updateVehicle error:', error);
+      }
+    } catch (err) {
+      console.error('Supabase updateVehicle exception:', err);
     }
-  } catch (err) {
-    console.warn('Fallback: updated in localStorage');
   }
 }
 
@@ -362,22 +365,17 @@ export async function deleteVehicle(id: string): Promise<void> {
 
   if (supabase) {
     try {
-      await supabase
+      const { error } = await supabase
         .from('vehicles')
         .delete()
         .eq('id', id);
+      
+      if (error) {
+        console.error('Supabase deleteVehicle error:', error);
+      }
     } catch (err) {
-      console.warn('Supabase deleteVehicle error:', err);
+      console.error('Supabase deleteVehicle exception:', err);
     }
-  }
-
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const docRef = doc(db, 'vehicles', id);
-      await deleteDoc(docRef);
-    }
-  } catch (err) {
-    console.warn('Fallback: deleted from localStorage');
   }
 }
 
@@ -417,47 +415,69 @@ export async function createReservation(
   inMemoryReservations.unshift(newReservation);
   saveStoredReservations(inMemoryReservations);
 
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const reservationId = await runTransaction(db, async (transaction) => {
-        const clientsRef = collection(db, 'clients');
-        const q = query(clientsRef, where('email', '==', clientInput.email));
-        const clientQuerySnap = await getDocs(q);
-        
-        let cid = '';
-        if (!clientQuerySnap.empty) {
-          cid = clientQuerySnap.docs[0].id;
-          const clientDocRef = doc(db, 'clients', cid);
-          transaction.update(clientDocRef, {
-            lastName: clientInput.lastName,
-            firstName: clientInput.firstName,
+  // Synchronisation Supabase directe
+  if (supabase) {
+    try {
+      // 1. Enregistrer ou mettre à jour le client dans Supabase
+      let finalClientId = clientId;
+      const { data: existingClient } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('email', clientInput.email)
+        .maybeSingle();
+
+      if (existingClient && existingClient.id) {
+        finalClientId = existingClient.id;
+        await supabase
+          .from('clients')
+          .update({
+            first_name: clientInput.firstName,
+            last_name: clientInput.lastName,
             phone: clientInput.phone,
-            drivingLicenseNumber: clientInput.drivingLicenseNumber,
-          });
-        } else {
-          const newClientDocRef = doc(collection(db, 'clients'));
-          cid = newClientDocRef.id;
-          transaction.set(newClientDocRef, {
-            ...clientInput,
-            createdAt: Timestamp.now(),
-          });
-        }
+            driving_license_number: clientInput.drivingLicenseNumber,
+          })
+          .eq('id', finalClientId);
+      } else {
+        await supabase
+          .from('clients')
+          .insert([{
+            id: finalClientId,
+            first_name: clientInput.firstName,
+            last_name: clientInput.lastName,
+            email: clientInput.email,
+            phone: clientInput.phone,
+            driving_license_number: clientInput.drivingLicenseNumber,
+            created_at: new Date().toISOString()
+          }]);
+      }
 
-        const newResDocRef = doc(collection(db, 'reservations'));
-        transaction.set(newResDocRef, {
-          ...reservationInput,
-          clientId: cid,
-          clientName: `${clientInput.firstName} ${clientInput.lastName}`,
-          createdAt: Timestamp.now(),
-        });
+      // 2. Enregistrer la réservation dans Supabase
+      const { data: resData, error: resError } = await supabase
+        .from('reservations')
+        .insert([{
+          id: resId,
+          vehicle_id: reservationInput.vehicleId,
+          vehicle_name: reservationInput.vehicleName,
+          client_id: finalClientId,
+          client_name: `${clientInput.firstName} ${clientInput.lastName}`,
+          start_date: reservationInput.startDate,
+          end_date: reservationInput.endDate,
+          total_days: Number(reservationInput.totalDays),
+          total_price: Number(reservationInput.totalPrice),
+          status: reservationInput.status || 'EN_ATTENTE',
+          specific_details: reservationInput.specificDetails || {},
+          created_at: new Date().toISOString()
+        }])
+        .select();
 
-        return newResDocRef.id;
-      });
-
-      return reservationId;
+      if (resError) {
+        console.error('Supabase createReservation error:', resError);
+      } else if (resData && resData.length > 0) {
+        return resData[0].id;
+      }
+    } catch (err) {
+      console.error('Supabase reservation sync error:', err);
     }
-  } catch (error) {
-    console.warn('Fallback: reservation saved in memory');
   }
 
   return resId;
@@ -476,96 +496,81 @@ export async function getReservations(): Promise<Reservation[]> {
       if (data && data.length > 0) {
         return data.map((r: any) => ({
           id: r.id,
-          vehicleId: r.vehicle_id || r.vehicleId || '',
-          vehicleName: r.vehicle_name || r.vehicleName || '',
-          clientId: r.client_id || r.clientId || '',
-          clientName: r.client_name || r.clientName || '',
-          startDate: r.start_date || r.startDate || '',
-          endDate: r.end_date || r.endDate || '',
-          totalDays: r.total_days || r.totalDays || 0,
-          totalPrice: r.total_price || r.totalPrice || 0,
-          status: r.status || 'EN_ATTENTE',
-          specificDetails: r.specific_details || r.specificDetails || {},
+          vehicleId: r.vehicle_id || '',
+          vehicleName: r.vehicle_name || '',
+          clientId: r.client_id || '',
+          clientName: r.client_name || '',
+          startDate: r.start_date || '',
+          endDate: r.end_date || '',
+          totalDays: Number(r.total_days) || 0,
+          totalPrice: Number(r.total_price) || 0,
+          status: (r.status as ReservationStatus) || 'EN_ATTENTE',
+          specificDetails: r.specific_details || {},
         }));
       }
     } catch (sbErr) {
-      console.warn('Supabase fetch fallback to local storage');
+      console.warn('Supabase fetch reservations error:', sbErr);
     }
   }
 
-  try {
-    if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
-      return [...inMemoryReservations];
-    }
-    const q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    const list: Reservation[] = [];
-    querySnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      list.push({
-        id: docSnap.id,
-        vehicleId: data.vehicleId || '',
-        vehicleName: data.vehicleName || '',
-        clientId: data.clientId || '',
-        clientName: data.clientName || '',
-        startDate: data.startDate || '',
-        endDate: data.endDate || '',
-        totalDays: data.totalDays || 0,
-        totalPrice: data.totalPrice || 0,
-        status: data.status || 'EN_ATTENTE',
-        specificDetails: data.specificDetails || {},
-      });
-    });
-    return list.length > 0 ? list : [...inMemoryReservations];
-  } catch (error) {
-    return [...inMemoryReservations];
-  }
+  return [...inMemoryReservations];
 }
 
 export async function updateReservationStatus(id: string, status: ReservationStatus): Promise<void> {
   inMemoryReservations = getStoredReservations();
   inMemoryReservations = inMemoryReservations.map(r => r.id === id ? { ...r, status } : r);
   saveStoredReservations(inMemoryReservations);
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const docRef = doc(db, 'reservations', id);
-      await updateDoc(docRef, { status });
+
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('reservations')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase updateReservationStatus error:', error);
+      }
+    } catch (err) {
+      console.error('Supabase updateReservationStatus error:', err);
     }
-  } catch (err) {
-    // Memory fallback
   }
 }
 
 export async function updateLatestReservationStatus(status: ReservationStatus): Promise<void> {
   inMemoryReservations = getStoredReservations();
   if (inMemoryReservations.length > 0) {
+    const latestId = inMemoryReservations[0].id;
     inMemoryReservations[0].status = status;
     saveStoredReservations(inMemoryReservations);
+    await updateReservationStatus(latestId, status);
   }
 }
 
 export async function getClients(): Promise<Client[]> {
   const storedClients = getStoredClients();
-  try {
-    if (!db || db.app?.options?.projectId === 'mock-project-id' || !db.app?.options?.projectId) {
-      return storedClients;
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        return data.map((c: any) => ({
+          id: c.id,
+          firstName: c.first_name || '',
+          lastName: c.last_name || '',
+          email: c.email || '',
+          phone: c.phone || '',
+          drivingLicenseNumber: c.driving_license_number || '',
+        }));
+      }
+    } catch (err) {
+      console.warn('Supabase getClients error:', err);
     }
-    const q = query(collection(db, 'clients'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    const list: Client[] = [];
-    querySnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      list.push({
-        id: docSnap.id,
-        lastName: data.lastName || '',
-        firstName: data.firstName || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        drivingLicenseNumber: data.drivingLicenseNumber || '',
-      });
-    });
-    return list.length > 0 ? list : storedClients;
-  } catch (error) {
-    return storedClients;
   }
+
+  return storedClients;
 }

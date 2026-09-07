@@ -81,7 +81,7 @@ export default function AdminLayout({
         onClose={() => setMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full grain-bg">
+      <main className="flex-1 p-3.5 sm:p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full grain-bg">
         {children}
       </main>
     </div>

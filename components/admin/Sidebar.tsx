@@ -88,7 +88,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       </nav>
 
       {/* User Session Info & Theme / Logout */}
-      <div className="p-4 border-t border-brand-border mt-auto space-y-3">
+      <div className="p-4 pb-6 sm:pb-4 border-t border-brand-border mt-auto space-y-3">
         {/* Toggle Theme dans la Sidebar */}
         <ThemeToggle variant="button" />
 

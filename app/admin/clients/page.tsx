@@ -90,8 +90,8 @@ export default function AdminClients() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-brand-border p-5 rounded-3xl shadow-sm">
-        <div className="flex-1 max-w-md relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white border border-brand-border p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm">
+        <div className="flex-1 w-full sm:max-w-md relative">
           <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
             <Search className="w-4 h-4" />
           </span>
@@ -105,7 +105,7 @@ export default function AdminClients() {
         </div>
       </div>
 
-      {/* Table list */}
+      {/* Clients List: Cards on Mobile & Table on Desktop */}
       {loading ? (
         <div className="space-y-3">
           <Skeleton height={60} className="w-full" />
@@ -113,69 +113,133 @@ export default function AdminClients() {
           <Skeleton height={60} className="w-full" />
         </div>
       ) : filteredClients.length === 0 ? (
-        <div className="bg-white border border-brand-border rounded-3xl p-12 text-center text-brand-muted shadow-sm">
+        <div className="bg-white border border-brand-border rounded-3xl p-8 sm:p-12 text-center text-brand-muted shadow-sm">
           <Users className="w-10 h-10 text-brand-muted/50 mx-auto mb-3" />
           <p className="text-sm font-semibold">Aucun client ne correspond à votre recherche.</p>
         </div>
       ) : (
-        <div className="bg-white border border-brand-border rounded-3xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-brand-beige/80 border-b border-brand-border text-brand-muted text-[11px] font-extrabold uppercase tracking-wider">
-                  <th className="py-4 px-6">Client</th>
-                  <th className="py-4 px-6">Coordonnées</th>
-                  <th className="py-4 px-6">Permis de conduire</th>
-                  <th className="py-4 px-6">Historique locations</th>
-                  <th className="py-4 px-6 text-right">Total Dépensé</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-border text-xs">
-                {filteredClients.map((c) => {
-                  const stat = clientStats[c.id] || clientStats[`${c.firstName} ${c.lastName}`] || { count: 1, totalSpend: 665 };
-                  return (
-                    <tr key={c.id} className="hover:bg-brand-hover/40 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="font-extrabold text-brand-text text-sm flex items-center space-x-2">
-                          <span>{c.firstName} {c.lastName}</span>
-                          <Badge variant="success" size="sm">Vérifié</Badge>
-                        </div>
-                        <div className="font-mono text-[10px] text-brand-muted mt-0.5">{c.id}</div>
-                      </td>
-                      <td className="py-4 px-6 space-y-1">
-                        <div className="flex items-center space-x-1.5 text-brand-text">
-                          <Mail className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-                          <span className="truncate max-w-[200px]">{c.email}</span>
-                        </div>
-                        <div className="flex items-center space-x-1.5 text-brand-muted font-mono text-[11px]">
-                          <Phone className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-                          <span>{c.phone}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center space-x-1.5 font-mono text-brand-navy font-bold">
-                          <CreditCard className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-                          <span>{c.drivingLicenseNumber || '24FR98765432'}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center space-x-1.5 font-semibold text-brand-text">
-                          <CalendarCheck className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-                          <span>{stat.count} réservation{stat.count > 1 ? 's' : ''}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <span className="font-mono font-extrabold text-sm text-brand-navy">
-                          {stat.totalSpend} €
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        <>
+          {/* Vue Cartes sur Mobile (< md) */}
+          <div className="md:hidden space-y-3">
+            {filteredClients.map((c) => {
+              const stat = clientStats[c.id] || clientStats[`${c.firstName} ${c.lastName}`] || { count: 1, totalSpend: 665 };
+              return (
+                <div 
+                  key={c.id} 
+                  className="bg-white border border-brand-border rounded-2xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* En-tête : Nom & Statut vérifié */}
+                  <div className="flex items-start justify-between border-b border-brand-border/60 pb-2.5">
+                    <div>
+                      <h3 className="font-extrabold text-brand-text text-sm">
+                        {c.firstName} {c.lastName}
+                      </h3>
+                      <p className="font-mono text-[10px] text-brand-muted">Réf : {c.id}</p>
+                    </div>
+                    <Badge variant="success" size="sm">Vérifié</Badge>
+                  </div>
+
+                  {/* Coordonnées rapides avec boutons tactiles */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <a
+                      href={`mailto:${c.email}`}
+                      className="flex items-center space-x-2 p-2 bg-brand-beige/50 hover:bg-brand-hover rounded-xl text-brand-text truncate transition-colors"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                      <span className="truncate">{c.email}</span>
+                    </a>
+                    <a
+                      href={`tel:${c.phone}`}
+                      className="flex items-center space-x-2 p-2 bg-brand-beige/50 hover:bg-brand-hover rounded-xl text-brand-text font-mono transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                      <span>{c.phone}</span>
+                    </a>
+                  </div>
+
+                  {/* Détails : Permis & Dépenses */}
+                  <div className="flex items-center justify-between pt-2.5 border-t border-brand-border/60 text-xs">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-brand-muted block">Permis de conduire</span>
+                      <span className="font-mono font-bold text-brand-navy text-[11px]">
+                        {c.drivingLicenseNumber || '24FR98765432'}
+                      </span>
+                    </div>
+
+                    <div className="text-right space-y-0.5">
+                      <span className="text-[10px] text-brand-muted block">
+                        {stat.count} résa{stat.count > 1 ? 's' : ''} • Total
+                      </span>
+                      <span className="font-mono font-black text-sm text-brand-accent">
+                        {stat.totalSpend} €
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
+
+          {/* Vue Tableau sur Desktop (>= md) */}
+          <div className="hidden md:block bg-white border border-brand-border rounded-3xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-brand-beige/80 border-b border-brand-border text-brand-muted text-[11px] font-extrabold uppercase tracking-wider">
+                    <th className="py-4 px-6">Client</th>
+                    <th className="py-4 px-6">Coordonnées</th>
+                    <th className="py-4 px-6">Permis de conduire</th>
+                    <th className="py-4 px-6">Historique locations</th>
+                    <th className="py-4 px-6 text-right">Total Dépensé</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-border text-xs">
+                  {filteredClients.map((c) => {
+                    const stat = clientStats[c.id] || clientStats[`${c.firstName} ${c.lastName}`] || { count: 1, totalSpend: 665 };
+                    return (
+                      <tr key={c.id} className="hover:bg-brand-hover/40 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="font-extrabold text-brand-text text-sm flex items-center space-x-2">
+                            <span>{c.firstName} {c.lastName}</span>
+                            <Badge variant="success" size="sm">Vérifié</Badge>
+                          </div>
+                          <div className="font-mono text-[10px] text-brand-muted mt-0.5">{c.id}</div>
+                        </td>
+                        <td className="py-4 px-6 space-y-1">
+                          <div className="flex items-center space-x-1.5 text-brand-text">
+                            <Mail className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                            <span className="truncate max-w-[200px]">{c.email}</span>
+                          </div>
+                          <div className="flex items-center space-x-1.5 text-brand-muted font-mono text-[11px]">
+                            <Phone className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                            <span>{c.phone}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center space-x-1.5 font-mono text-brand-navy font-bold">
+                            <CreditCard className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                            <span>{c.drivingLicenseNumber || '24FR98765432'}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center space-x-1.5 font-semibold text-brand-text">
+                            <CalendarCheck className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                            <span>{stat.count} réservation{stat.count > 1 ? 's' : ''}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <span className="font-mono font-extrabold text-sm text-brand-navy">
+                            {stat.totalSpend} €
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

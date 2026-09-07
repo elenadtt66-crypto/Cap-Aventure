@@ -122,18 +122,18 @@ export default function AdminCalendar() {
         </div>
 
         {/* Quick stats strip */}
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-2 bg-white border border-brand-border rounded-xl text-xs font-bold text-brand-text shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex-1 sm:flex-none px-3.5 py-2 bg-white border border-brand-border rounded-xl text-xs font-bold text-brand-text shadow-sm text-center">
             <span className="text-brand-muted font-semibold">En attente </span>
             <span className="font-mono text-[#CA8A04] ml-1">{pendingCount}</span>
           </div>
-          <div className="px-4 py-2 bg-white border border-brand-border rounded-xl text-xs font-bold text-brand-text shadow-sm">
+          <div className="flex-1 sm:flex-none px-3.5 py-2 bg-white border border-brand-border rounded-xl text-xs font-bold text-brand-text shadow-sm text-center">
             <span className="text-brand-muted font-semibold">Confirmées </span>
             <span className="font-mono text-[#16A34A] ml-1">{confirmedCount}</span>
           </div>
           <button
             onClick={loadData}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-brand-border rounded-xl text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-4 py-2 bg-white border border-brand-border rounded-xl text-xs sm:text-sm font-semibold hover:bg-brand-hover text-brand-text transition-all duration-200 cursor-pointer shadow-sm"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Actualiser</span>
@@ -142,9 +142,9 @@ export default function AdminCalendar() {
       </div>
 
       {/* Toolbar — Date Range Filter + Nav mois */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white border border-brand-border p-4 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-white border border-brand-border p-3.5 sm:p-4 rounded-2xl shadow-sm">
         {/* DateRangePicker */}
-        <div className="w-full md:w-80">
+        <div className="w-full sm:w-80">
           <DateRangePicker
             value={filterRange}
             onChange={(range) => setFilterRange(range)}
@@ -154,21 +154,23 @@ export default function AdminCalendar() {
         </div>
 
         {/* Navigation mois */}
-        <div className="flex items-center space-x-2 bg-brand-beige border border-brand-border p-1.5 rounded-xl">
+        <div className="flex items-center justify-between sm:justify-center space-x-2 bg-brand-beige border border-brand-border p-1.5 rounded-xl w-full sm:w-auto">
           <button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-white rounded-lg transition-all duration-200 cursor-pointer text-brand-text shadow-sm hover:shadow"
+            aria-label="Mois précédent"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <span className="text-sm font-extrabold text-brand-text px-3 min-w-36 text-center capitalize">
+          <span className="text-xs sm:text-sm font-extrabold text-brand-text px-2 sm:px-3 min-w-32 text-center capitalize">
             {monthName}
           </span>
           <button
             onClick={handleNextMonth}
             className="p-2 hover:bg-white rounded-lg transition-all duration-200 cursor-pointer text-brand-text shadow-sm hover:shadow"
+            aria-label="Mois suivant"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -183,63 +185,13 @@ export default function AdminCalendar() {
           <p>Chargement du planning...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          {/* Legend sidebar */}
-          <div className="bg-white border border-brand-border p-6 rounded-2xl space-y-6 shadow-sm">
-            <h3 className="font-extrabold text-brand-text text-sm border-b border-brand-border pb-3 flex items-center space-x-2">
-              <Info className="w-4 h-4 text-brand-accent" />
-              <span>Légende véhicules</span>
-            </h3>
-
-            {vehicles.length === 0 ? (
-              <p className="text-xs text-brand-muted italic">Aucun véhicule enregistré.</p>
-            ) : (
-              <div className="space-y-3">
-                {vehicles.map((v) => (
-                  <div key={v.id} className="flex items-center space-x-3 text-xs group">
-                    <div
-                      className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white shadow-sm"
-                      style={{ backgroundColor: vehicleTypeColor[v.type] || '#8B5CF6' }}
-                    />
-                    <span className="font-semibold text-brand-text truncate">{v.name}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Statut legend */}
-            <div className="border-t border-brand-border pt-4 space-y-2.5">
-              <p className="text-[10px] font-extrabold uppercase text-brand-muted tracking-wider">Statuts</p>
-              {[
-                { label: 'En attente', color: 'bg-[#CA8A04]' },
-                { label: 'Confirmée', color: 'bg-[#16A34A]' },
-                { label: 'Terminée', color: 'bg-brand-muted' },
-              ].map(s => (
-                <div key={s.label} className="flex items-center space-x-2.5 text-xs">
-                  <span className={`w-2 h-2 rounded-full ${s.color}`} />
-                  <span className="text-brand-text font-medium">{s.label}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Filtre actif info */}
-            {(filterRange.startDate || filterRange.endDate) && (
-              <div className="border-t border-brand-border pt-4">
-                <p className="text-[10px] font-extrabold uppercase text-brand-muted tracking-wider mb-2">Filtre actif</p>
-                <div className="p-2.5 bg-brand-accent/8 border border-brand-accent/20 rounded-xl text-[10px] text-brand-accent font-bold">
-                  {filterRange.startDate && new Date(filterRange.startDate).toLocaleDateString('fr-FR')}
-                  {filterRange.endDate && ` → ${new Date(filterRange.endDate).toLocaleDateString('fr-FR')}`}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Calendar grid */}
-          <div className="lg:col-span-3 bg-white border border-brand-border p-6 rounded-3xl shadow-sm space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
+          {/* Calendar grid (Prioritaire sur mobile: order-1) */}
+          <div className="order-1 lg:order-2 lg:col-span-3 bg-white border border-brand-border p-3 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm space-y-3 sm:space-y-4">
             {/* Weekday headers */}
             <div className="grid grid-cols-7 gap-1 text-center">
               {weekdays.map((day) => (
-                <div key={day} className="text-[10px] font-extrabold uppercase text-brand-muted tracking-widest py-2">
+                <div key={day} className="text-[9px] sm:text-[10px] font-extrabold uppercase text-brand-muted tracking-widest py-1.5 sm:py-2">
                   {day}
                 </div>
               ))}
@@ -247,7 +199,7 @@ export default function AdminCalendar() {
               {/* Days grid */}
               {calendarDays.map((day, idx) => {
                 if (!day) {
-                  return <div key={`empty-${idx}`} className="h-20 rounded-xl" />;
+                  return <div key={`empty-${idx}`} className="min-h-[58px] sm:h-20 rounded-lg sm:rounded-xl" />;
                 }
 
                 const dayRes = getReservationsForDay(day.dateString);
@@ -259,9 +211,9 @@ export default function AdminCalendar() {
                   <div
                     key={day.dateString}
                     className={`
-                      h-20 border rounded-xl p-2 flex flex-col justify-between transition-all duration-150 overflow-hidden group
+                      min-h-[58px] sm:h-20 border rounded-lg sm:rounded-xl p-1 sm:p-2 flex flex-col justify-between transition-all duration-150 overflow-hidden group
                       ${isToday
-                        ? 'border-brand-accent/50 bg-brand-accent/5'
+                        ? 'border-brand-accent/50 bg-brand-accent/5 ring-1 ring-brand-accent/20'
                         : isFiltered
                         ? 'border-brand-accent/25 bg-brand-accent/4'
                         : 'border-brand-border/60 bg-brand-beige/20 hover:border-brand-accent/30 hover:bg-brand-hover/40'
@@ -269,13 +221,13 @@ export default function AdminCalendar() {
                     `}
                   >
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs font-bold transition-colors ${
+                      <span className={`text-[11px] sm:text-xs font-bold transition-colors ${
                         isToday ? 'text-brand-accent' : 'text-brand-text group-hover:text-brand-accent'
                       }`}>
                         {day.dayNumber}
                       </span>
                       {isToday && (
-                        <span className="text-[8px] font-extrabold text-brand-accent uppercase tracking-wider">Auj.</span>
+                        <span className="text-[7px] sm:text-[8px] font-extrabold text-brand-accent uppercase tracking-wider">Auj.</span>
                       )}
                     </div>
 
@@ -287,7 +239,7 @@ export default function AdminCalendar() {
                         return (
                           <div
                             key={r.id}
-                            className="px-1.5 py-0.5 rounded text-[7px] font-bold text-white truncate leading-tight"
+                            className="px-1 py-0.5 rounded text-[6px] sm:text-[7px] font-bold text-white truncate leading-tight"
                             style={{ backgroundColor: color }}
                             title={`${r.clientName} — ${r.vehicleName}`}
                           >
@@ -296,8 +248,8 @@ export default function AdminCalendar() {
                         );
                       })}
                       {dayRes.length > 2 && (
-                        <div className="text-[7px] font-bold text-brand-muted pl-1">
-                          +{dayRes.length - 2} autres
+                        <div className="text-[6px] sm:text-[7px] font-bold text-brand-muted pl-0.5">
+                          +{dayRes.length - 2}
                         </div>
                       )}
                     </div>
@@ -305,6 +257,58 @@ export default function AdminCalendar() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Legend sidebar (Secondaire sur mobile: order-2) */}
+          <div className="order-2 lg:order-1 bg-white border border-brand-border p-4 sm:p-6 rounded-2xl space-y-5 shadow-sm">
+            <h3 className="font-extrabold text-brand-text text-xs sm:text-sm border-b border-brand-border pb-2.5 flex items-center space-x-2">
+              <Info className="w-4 h-4 text-brand-accent" />
+              <span>Légende véhicules</span>
+            </h3>
+
+            {vehicles.length === 0 ? (
+              <p className="text-xs text-brand-muted italic">Aucun véhicule enregistré.</p>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-2.5">
+                {vehicles.map((v) => (
+                  <div key={v.id} className="flex items-center space-x-2 text-xs group min-w-0">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-2 ring-white shadow-sm"
+                      style={{ backgroundColor: vehicleTypeColor[v.type] || '#8B5CF6' }}
+                    />
+                    <span className="font-semibold text-brand-text truncate text-[11px] sm:text-xs">{v.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Statut legend */}
+            <div className="border-t border-brand-border pt-3 space-y-2">
+              <p className="text-[10px] font-extrabold uppercase text-brand-muted tracking-wider">Statuts</p>
+              <div className="flex flex-wrap lg:flex-col gap-2.5">
+                {[
+                  { label: 'En attente', color: 'bg-[#CA8A04]' },
+                  { label: 'Confirmée', color: 'bg-[#16A34A]' },
+                  { label: 'Terminée', color: 'bg-brand-muted' },
+                ].map(s => (
+                  <div key={s.label} className="flex items-center space-x-2 text-xs">
+                    <span className={`w-2 h-2 rounded-full ${s.color}`} />
+                    <span className="text-brand-text font-medium text-[11px]">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Filtre actif info */}
+            {(filterRange.startDate || filterRange.endDate) && (
+              <div className="border-t border-brand-border pt-3">
+                <p className="text-[10px] font-extrabold uppercase text-brand-muted tracking-wider mb-1.5">Filtre actif</p>
+                <div className="p-2 bg-brand-accent/8 border border-brand-accent/20 rounded-xl text-[10px] text-brand-accent font-bold">
+                  {filterRange.startDate && new Date(filterRange.startDate).toLocaleDateString('fr-FR')}
+                  {filterRange.endDate && ` → ${new Date(filterRange.endDate).toLocaleDateString('fr-FR')}`}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

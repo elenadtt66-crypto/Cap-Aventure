@@ -197,10 +197,10 @@ export default function VehicleDetailClient({ slug }: Props) {
 
         {/* Galerie Photos (Grid + Lightbox Trigger) */}
         <div className="relative mb-12 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-900">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-2">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-1.5 sm:p-2">
             {/* Photo Principale Grand Format */}
             <div 
-              className="md:col-span-2 relative aspect-[4/3] md:aspect-auto md:h-[440px] rounded-2xl overflow-hidden cursor-pointer group"
+              className="md:col-span-2 relative aspect-[4/3] sm:aspect-[16/10] md:aspect-auto md:h-[440px] rounded-2xl overflow-hidden cursor-pointer group"
               onClick={() => { setActiveImageIndex(0); setIsGalleryOpen(true); }}
             >
               <img
@@ -209,15 +209,15 @@ export default function VehicleDetailClient({ slug }: Props) {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <span className="text-white text-sm font-medium flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/50">
+                <span className="text-white text-xs sm:text-sm font-medium flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/50">
                   <Maximize2 className="w-4 h-4 text-emerald-400" />
                   <span>Agrandir la photo</span>
                 </span>
               </div>
             </div>
 
-            {/* Photos Secondaires (Grille 2x2) */}
-            <div className="md:col-span-2 grid grid-cols-2 gap-2 h-[440px]">
+            {/* Photos Secondaires (Grille 2x2 uniquement visible sur Desktop) */}
+            <div className="hidden md:grid md:col-span-2 grid-cols-2 gap-2 h-[440px]">
               {vehicle.images.slice(1, 5).map((img, idx) => (
                 <div
                   key={idx}
@@ -238,28 +238,28 @@ export default function VehicleDetailClient({ slug }: Props) {
           {/* Bouton Voir Toutes les Photos */}
           <button
             onClick={() => { setActiveImageIndex(0); setIsGalleryOpen(true); }}
-            className="absolute bottom-6 right-6 inline-flex items-center space-x-2 bg-slate-900/90 hover:bg-slate-900 text-white font-medium px-4 py-2.5 rounded-xl border border-slate-700/80 backdrop-blur-md shadow-xl transition-all hover:scale-105"
+            className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 inline-flex items-center space-x-1.5 sm:space-x-2 bg-slate-900/90 hover:bg-slate-900 text-white font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-slate-700/80 backdrop-blur-md shadow-xl text-xs sm:text-sm transition-all hover:scale-105"
           >
-            <Camera className="w-4 h-4 text-emerald-400" />
-            <span>Voir toutes les photos ({vehicle.images.length})</span>
+            <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+            <span>Photos ({vehicle.images.length})</span>
           </button>
         </div>
 
         {/* Layout 2 Colonnes (Contenu Principal & Widget de Réservation Sticky) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           
           {/* Colonne Gauche : Détails & Équipements (2 Cols) */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-8 sm:space-y-10">
 
             {/* Badges Caractéristiques Clés */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-slate-900/60 rounded-3xl border border-slate-800/80 backdrop-blur-xl">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400">
-                  <Users className="w-6 h-6" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-6 bg-slate-900/60 rounded-3xl border border-slate-800/80 backdrop-blur-xl">
+              <div className="flex items-center space-x-2.5 sm:space-x-3">
+                <div className="p-2.5 sm:p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 flex-shrink-0">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Capacité</p>
-                  <p className="text-sm font-bold text-white">{vehicle.seats} places</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] sm:text-xs text-slate-400 font-medium">Capacité</p>
+                  <p className="text-xs sm:text-sm font-bold text-white truncate">{vehicle.seats} places</p>
                 </div>
               </div>
 

@@ -36,6 +36,18 @@ function VehiclesContent() {
   const [filterBeds, setFilterBeds] = useState('');
   const [maxPrice, setMaxPrice] = useState('300');
   const [sortBy, setSortBy] = useState('price-asc');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Nombre de filtres actifs
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filterType) count++;
+    if (filterLocation) count++;
+    if (filterSeats) count++;
+    if (filterBeds) count++;
+    if (maxPrice !== '300') count++;
+    return count;
+  }, [filterType, filterLocation, filterSeats, filterBeds, maxPrice]);
 
   useEffect(() => {
     async function loadData() {
@@ -105,6 +117,7 @@ function VehiclesContent() {
     setFilterBeds('');
     setMaxPrice('300');
     setSortBy('price-asc');
+    setShowMobileFilters(false);
     router.push('/vehicules');
   };
 
@@ -119,22 +132,46 @@ function VehiclesContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 w-full space-y-10 grain-bg">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6 sm:space-y-10 grain-bg">
       {/* Page Header */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         <Badge variant="gold">Flotte Premium Vérifiée</Badge>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-brand-text tracking-tight">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-brand-text tracking-tight">
           Louez votre van ou camping-car
         </h1>
-        <p className="text-sm md:text-base text-brand-muted max-w-2xl">
+        <p className="text-xs sm:text-sm md:text-base text-brand-muted max-w-2xl">
           Découvrez notre catalogue de {vehicles.length} modèles uniques, préparés et assurés tous risques pour votre roadtrip.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+      {/* Bouton Filtres sur Mobile (< lg) */}
+      <div className="lg:hidden">
+        <button
+          type="button"
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="w-full flex items-center justify-between p-4 bg-white border border-brand-border rounded-2xl shadow-sm text-sm font-bold text-brand-text transition-all active:scale-[0.99] cursor-pointer"
+        >
+          <div className="flex items-center space-x-2.5">
+            <SlidersHorizontal className="w-4 h-4 text-brand-accent" />
+            <span>Filtres de recherche</span>
+            {activeFiltersCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-brand-accent text-white text-[10px] font-extrabold flex items-center justify-center">
+                {activeFiltersCount}
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-brand-accent font-semibold">
+            {showMobileFilters ? '▲ Masquer' : '▼ Afficher'}
+          </span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 items-start">
         {/* Filters Sidebar */}
-        <aside className="bg-white border border-brand-border p-6 rounded-3xl space-y-6 sticky top-28 shadow-sm">
-          <div className="flex items-center justify-between border-b border-brand-border pb-4">
+        <aside className={`bg-white border border-brand-border p-5 sm:p-6 rounded-3xl space-y-5 sm:space-y-6 lg:sticky lg:top-28 shadow-sm ${
+          showMobileFilters ? 'block animate-fade-in' : 'hidden lg:block'
+        }`}>
+          <div className="flex items-center justify-between border-b border-brand-border pb-3 sm:pb-4">
             <h3 className="font-extrabold text-brand-text flex items-center space-x-2 text-sm">
               <SlidersHorizontal className="w-4 h-4 text-brand-accent" />
               <span>Filtres de recherche</span>

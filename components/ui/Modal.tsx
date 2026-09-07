@@ -62,26 +62,26 @@ export default function Modal({
 
   return createPortal(
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-brand-navy/60 backdrop-blur-md transition-all duration-300"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-2.5 sm:p-6 overflow-y-auto bg-brand-navy/60 backdrop-blur-md transition-all duration-300 overscroll-contain"
       onClick={onClose}
       aria-modal="true"
       role="dialog"
     >
       <div 
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white border border-brand-border rounded-3xl p-6 sm:p-8 shadow-2xl my-auto animate-scale-up text-brand-text max-h-[92vh] flex flex-col`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white border border-brand-border rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl my-auto animate-scale-up text-brand-text max-h-[94vh] sm:max-h-[90vh] flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || description) && (
-          <div className="flex items-start justify-between border-b border-brand-border pb-4 mb-5">
-            <div>
+          <div className="flex items-start justify-between border-b border-brand-border pb-3.5 sm:pb-4 mb-4 sm:mb-5 gap-3">
+            <div className="min-w-0 flex-1">
               {title && (
-                <h2 className="text-xl sm:text-2xl font-extrabold text-brand-text tracking-tight">
+                <h2 className="text-lg sm:text-2xl font-extrabold text-brand-text tracking-tight truncate sm:whitespace-normal">
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="text-xs text-brand-muted mt-1">
+                <p className="text-[11px] sm:text-xs text-brand-muted mt-0.5 sm:mt-1 line-clamp-2 sm:line-clamp-none">
                   {description}
                 </p>
               )}
@@ -89,7 +89,7 @@ export default function Modal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-brand-muted hover:text-brand-text hover:bg-brand-hover transition-colors cursor-pointer"
+              className="p-2 sm:p-2.5 rounded-xl text-brand-muted hover:text-brand-text hover:bg-brand-hover active:bg-brand-border transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center flex-shrink-0"
               aria-label="Fermer"
             >
               <X className="w-5 h-5" />
@@ -98,7 +98,7 @@ export default function Modal({
         )}
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto pr-1">
+        <div className="flex-1 overflow-y-auto pr-0.5 sm:pr-1 overscroll-contain">
           {children}
         </div>
       </div>

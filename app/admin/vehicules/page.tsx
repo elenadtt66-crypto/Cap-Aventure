@@ -440,9 +440,9 @@ export default function AdminVehicles() {
           </div>
 
           {/* Capacités & Motorisation */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div>
-              <label htmlFor="formSeats" className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
+              <label htmlFor="formSeats" className="block text-[10px] sm:text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-1.5 sm:mb-2">
                 Places Route
               </label>
               <input
@@ -453,12 +453,12 @@ export default function AdminVehicles() {
                 max="8"
                 value={formData.seats}
                 onChange={(e) => setFormData(prev => ({ ...prev, seats: parseInt(e.target.value) || 1 }))}
-                className="w-full px-4 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-mono text-center font-bold"
+                className="w-full px-3 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-mono text-center font-bold"
               />
             </div>
 
             <div>
-              <label htmlFor="formBeds" className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
+              <label htmlFor="formBeds" className="block text-[10px] sm:text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-1.5 sm:mb-2">
                 Couchages
               </label>
               <input
@@ -469,34 +469,34 @@ export default function AdminVehicles() {
                 max="8"
                 value={formData.beds}
                 onChange={(e) => setFormData(prev => ({ ...prev, beds: parseInt(e.target.value) || 1 }))}
-                className="w-full px-4 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-mono text-center font-bold"
+                className="w-full px-3 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-mono text-center font-bold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
-                Transmission
+              <label className="block text-[10px] sm:text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-1.5 sm:mb-2">
+                Boîte
               </label>
               <SelectMenu
                 options={transmissionOptions}
                 value={formData.transmission}
                 onChange={(val) => setFormData(prev => ({ ...prev, transmission: val as any }))}
                 className="w-full"
-                size="md"
+                size="sm"
               />
             </div>
 
             <div>
-              <label htmlFor="formPower" className="block text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-2">
-                Puissance moteur
+              <label htmlFor="formPower" className="block text-[10px] sm:text-xs font-extrabold uppercase text-brand-muted tracking-wider mb-1.5 sm:mb-2">
+                Puissance
               </label>
               <input
                 id="formPower"
                 type="text"
                 value={formData.enginePower}
                 onChange={(e) => setFormData(prev => ({ ...prev, enginePower: e.target.value }))}
-                className="w-full px-4 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-semibold text-center"
-                placeholder="Ex: 150 ch"
+                className="w-full px-3 py-2.5 bg-brand-beige border border-brand-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-semibold text-center"
+                placeholder="150 ch"
               />
             </div>
           </div>
@@ -533,13 +533,13 @@ export default function AdminVehicles() {
           </div>
 
           {/* Disponibilité */}
-          <div className="flex items-center space-x-3 p-4 bg-brand-beige rounded-2xl border border-brand-border">
+          <div className="flex items-center space-x-3 p-3.5 sm:p-4 bg-brand-beige rounded-2xl border border-brand-border">
             <input
               id="formAvail"
               type="checkbox"
               checked={formData.available}
               onChange={(e) => setFormData(prev => ({ ...prev, available: e.target.checked }))}
-              className="w-5 h-5 text-brand-accent border-brand-border rounded-lg focus:ring-brand-accent focus:ring-2 cursor-pointer accent-brand-accent"
+              className="w-5 h-5 text-brand-accent border-brand-border rounded-lg focus:ring-brand-accent focus:ring-2 cursor-pointer accent-brand-accent flex-shrink-0"
             />
             <label htmlFor="formAvail" className="text-xs font-bold text-brand-text cursor-pointer select-none">
               Véhicule actif et immédiatement disponible à la réservation
@@ -547,11 +547,12 @@ export default function AdminVehicles() {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end items-center space-x-3 pt-4 border-t border-brand-border">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 sm:gap-3 pt-4 border-t border-brand-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsFormOpen(false)}
+              className="w-full sm:w-auto justify-center"
             >
               Annuler
             </Button>
@@ -559,6 +560,7 @@ export default function AdminVehicles() {
               type="submit"
               variant="primary"
               isLoading={submitting}
+              className="w-full sm:w-auto justify-center"
             >
               {editingId ? 'Mettre à jour' : 'Enregistrer le véhicule'}
             </Button>
@@ -567,8 +569,8 @@ export default function AdminVehicles() {
       </Modal>
 
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-brand-border p-5 rounded-3xl shadow-sm">
-        <div className="flex-1 max-w-md relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white border border-brand-border p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm">
+        <div className="flex-1 w-full sm:max-w-md relative">
           <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
             <Search className="w-4 h-4" />
           </span>
@@ -581,29 +583,30 @@ export default function AdminVehicles() {
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="w-full sm:w-auto flex items-center gap-3">
           <SelectMenu
             options={filterCategoryOptions}
             value={selectedTypeFilter}
             onChange={(val) => setSelectedTypeFilter(val)}
             size="md"
+            className="w-full sm:w-64"
           />
         </div>
       </div>
 
       {/* Fleet list grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Skeleton variant="card" />
           <Skeleton variant="card" />
           <Skeleton variant="card" />
         </div>
       ) : filteredVehicles.length === 0 ? (
-        <div className="bg-white border border-brand-border rounded-3xl p-12 text-center text-brand-muted">
+        <div className="bg-white border border-brand-border rounded-3xl p-8 sm:p-12 text-center text-brand-muted">
           <p className="text-sm font-semibold">Aucun véhicule ne correspond à vos critères de recherche.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredVehicles.map((veh) => {
             const badgeInfo = vehicleTypeLabels[veh.type] || { label: veh.type, variant: 'neutral' as const };
             return (
@@ -668,14 +671,15 @@ export default function AdminVehicles() {
                       size="sm"
                       onClick={() => handleEditClick(veh)}
                       leftIcon={<Edit3 className="w-3.5 h-3.5 text-brand-accent" />}
-                      className="flex-1"
+                      className="flex-1 min-h-[38px] justify-center text-xs"
                     >
                       Modifier
                     </Button>
                     <button
                       onClick={() => handleOpenDeleteModal(veh)}
-                      className="p-2 border border-brand-error/20 hover:border-brand-error text-brand-error bg-brand-error/5 hover:bg-brand-error hover:text-white rounded-xl transition-all duration-200 cursor-pointer"
+                      className="p-2.5 border border-brand-error/20 hover:border-brand-error active:bg-brand-error active:text-white text-brand-error bg-brand-error/5 hover:bg-brand-error hover:text-white rounded-xl transition-all duration-200 cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center flex-shrink-0"
                       title="Supprimer le véhicule"
+                      aria-label="Supprimer le véhicule"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

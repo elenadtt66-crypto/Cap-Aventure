@@ -251,9 +251,9 @@ export default function DatePicker({
       {isOpen && (
         <div
           className="
-            absolute z-50 top-full mt-2 left-0 sm:right-auto min-w-[300px] sm:w-[320px]
+            absolute z-50 top-full mt-2 left-0 sm:right-auto w-[290px] sm:w-[320px] max-w-[calc(100vw-1.5rem)]
             bg-brand-card/98 backdrop-blur-md border border-brand-border
-            rounded-3xl shadow-2xl p-4 space-y-4 animate-scale-up
+            rounded-3xl shadow-2xl p-3.5 sm:p-4 space-y-3.5 sm:space-y-4 animate-scale-up
           "
         >
           {/* Header navigation du mois */}

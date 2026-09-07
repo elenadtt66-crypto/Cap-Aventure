@@ -146,8 +146,8 @@ export default function AdminReservations() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-brand-border p-5 rounded-3xl shadow-sm">
-        <div className="flex-1 max-w-md relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white border border-brand-border p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm">
+        <div className="flex-1 w-full sm:max-w-md relative">
           <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-brand-muted">
             <Search className="w-4 h-4" />
           </span>
@@ -160,17 +160,18 @@ export default function AdminReservations() {
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="w-full sm:w-auto flex items-center gap-3">
           <SelectMenu
             options={filterStatusOptions}
             value={statusFilter}
             onChange={(val) => setStatusFilter(val)}
             size="md"
+            className="w-full sm:w-56"
           />
         </div>
       </div>
 
-      {/* Table list */}
+      {/* Table list (Desktop) & Cards list (Mobile) */}
       {loading ? (
         <div className="space-y-3">
           <Skeleton height={60} className="w-full" />
@@ -178,88 +179,167 @@ export default function AdminReservations() {
           <Skeleton height={60} className="w-full" />
         </div>
       ) : filteredReservations.length === 0 ? (
-        <div className="bg-white border border-brand-border rounded-3xl p-12 text-center text-brand-muted shadow-sm">
+        <div className="bg-white border border-brand-border rounded-3xl p-8 sm:p-12 text-center text-brand-muted shadow-sm">
           <CalendarDays className="w-10 h-10 text-brand-muted/50 mx-auto mb-3" />
           <p className="text-sm font-semibold">Aucune réservation ne correspond aux critères.</p>
         </div>
       ) : (
-        <div className="bg-white border border-brand-border rounded-3xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-brand-beige/80 border-b border-brand-border text-brand-muted text-[11px] font-extrabold uppercase tracking-wider">
-                  <th className="py-4 px-6">Réf & Client</th>
-                  <th className="py-4 px-6">Véhicule loué</th>
-                  <th className="py-4 px-6">Période & Durée</th>
-                  <th className="py-4 px-6">Montant TTC</th>
-                  <th className="py-4 px-6">Statut</th>
-                  <th className="py-4 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-border text-xs">
-                {filteredReservations.map((r) => (
-                  <tr key={r.id} className="hover:bg-brand-hover/40 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="font-extrabold text-brand-text text-sm">{r.clientName}</div>
-                      <div className="font-mono text-[10px] text-brand-muted mt-0.5">{r.id}</div>
-                    </td>
-                    <td className="py-4 px-6 font-semibold text-brand-text">
-                      <div className="flex items-center space-x-1.5">
-                        <Car className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
-                        <span className="truncate max-w-[220px]">{r.vehicleName}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-medium text-brand-text">
-                        {new Date(r.startDate).toLocaleDateString('fr-FR')} → {new Date(r.endDate).toLocaleDateString('fr-FR')}
-                      </div>
-                      <div className="text-[10px] text-brand-muted font-bold mt-0.5">{r.totalDays} jours</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="font-mono font-extrabold text-sm text-brand-navy">
-                        {r.totalPrice} €
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      {getStatusBadge(r.status)}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedRes(r)}
-                          leftIcon={<Eye className="w-3.5 h-3.5 text-brand-accent" />}
+        <>
+          {/* Vue Cartes sur Mobile (< md) */}
+          <div className="md:hidden space-y-3">
+            {filteredReservations.map((r) => (
+              <div 
+                key={r.id} 
+                className="bg-white border border-brand-border rounded-2xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow"
+              >
+                {/* En-tête Carte : Client + Statut */}
+                <div className="flex items-start justify-between gap-2 border-b border-brand-border/60 pb-2.5">
+                  <div>
+                    <h3 className="font-extrabold text-brand-text text-sm">{r.clientName}</h3>
+                    <p className="font-mono text-[10px] text-brand-muted">Réf : {r.id}</p>
+                  </div>
+                  <div>
+                    {getStatusBadge(r.status)}
+                  </div>
+                </div>
+
+                {/* Infos véhicule & dates */}
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center space-x-1.5 text-brand-text font-semibold">
+                    <Car className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                    <span className="truncate">{r.vehicleName}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-brand-muted text-[11px]">
+                    <span>Du {new Date(r.startDate).toLocaleDateString('fr-FR')} au {new Date(r.endDate).toLocaleDateString('fr-FR')}</span>
+                    <span className="font-bold text-brand-text font-mono">({r.totalDays} j)</span>
+                  </div>
+                </div>
+
+                {/* Pied de carte : Prix + Actions */}
+                <div className="flex items-center justify-between pt-2.5 border-t border-brand-border/60">
+                  <div>
+                    <span className="text-[10px] text-brand-muted block">Total TTC</span>
+                    <span className="font-mono font-black text-base text-brand-navy">
+                      {r.totalPrice} €
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedRes(r)}
+                      leftIcon={<Eye className="w-3.5 h-3.5 text-brand-accent" />}
+                      className="text-xs py-2 px-3"
+                    >
+                      Détails
+                    </Button>
+                    
+                    {r.status === 'EN_ATTENTE' && (
+                      <>
+                        <button
+                          onClick={() => handleStatusUpdate(r.id, 'CONFIRMEE')}
+                          className="p-2 bg-brand-success/10 active:bg-brand-success hover:bg-brand-success text-brand-success hover:text-white rounded-xl transition-all cursor-pointer min-w-[34px] min-h-[34px] flex items-center justify-center"
+                          title="Valider la réservation"
+                          aria-label="Valider la réservation"
                         >
-                          Détails
-                        </Button>
-                        
-                        {r.status === 'EN_ATTENTE' && (
-                          <>
-                            <button
-                              onClick={() => handleStatusUpdate(r.id, 'CONFIRMEE')}
-                              className="p-2 bg-brand-success/10 hover:bg-brand-success text-brand-success hover:text-white rounded-xl transition-all duration-150 cursor-pointer"
-                              title="Valider la réservation"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleStatusUpdate(r.id, 'ANNULEE')}
-                              className="p-2 bg-brand-error/10 hover:bg-brand-error text-brand-error hover:text-white rounded-xl transition-all duration-150 cursor-pointer"
-                              title="Refuser / Annuler"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(r.id, 'ANNULEE')}
+                          className="p-2 bg-brand-error/10 active:bg-brand-error hover:bg-brand-error text-brand-error hover:text-white rounded-xl transition-all cursor-pointer min-w-[34px] min-h-[34px] flex items-center justify-center"
+                          title="Refuser / Annuler"
+                          aria-label="Refuser / Annuler"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Vue Tableau sur Desktop (>= md) */}
+          <div className="hidden md:block bg-white border border-brand-border rounded-3xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-brand-beige/80 border-b border-brand-border text-brand-muted text-[11px] font-extrabold uppercase tracking-wider">
+                    <th className="py-4 px-6">Réf & Client</th>
+                    <th className="py-4 px-6">Véhicule loué</th>
+                    <th className="py-4 px-6">Période & Durée</th>
+                    <th className="py-4 px-6">Montant TTC</th>
+                    <th className="py-4 px-6">Statut</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-border text-xs">
+                  {filteredReservations.map((r) => (
+                    <tr key={r.id} className="hover:bg-brand-hover/40 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="font-extrabold text-brand-text text-sm">{r.clientName}</div>
+                        <div className="font-mono text-[10px] text-brand-muted mt-0.5">{r.id}</div>
+                      </td>
+                      <td className="py-4 px-6 font-semibold text-brand-text">
+                        <div className="flex items-center space-x-1.5">
+                          <Car className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" />
+                          <span className="truncate max-w-[220px]">{r.vehicleName}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-brand-text">
+                          {new Date(r.startDate).toLocaleDateString('fr-FR')} → {new Date(r.endDate).toLocaleDateString('fr-FR')}
+                        </div>
+                        <div className="text-[10px] text-brand-muted font-bold mt-0.5">{r.totalDays} jours</div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="font-mono font-extrabold text-sm text-brand-navy">
+                          {r.totalPrice} €
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        {getStatusBadge(r.status)}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedRes(r)}
+                            leftIcon={<Eye className="w-3.5 h-3.5 text-brand-accent" />}
+                          >
+                            Détails
+                          </Button>
+                          
+                          {r.status === 'EN_ATTENTE' && (
+                            <>
+                              <button
+                                onClick={() => handleStatusUpdate(r.id, 'CONFIRMEE')}
+                                className="p-2 bg-brand-success/10 hover:bg-brand-success text-brand-success hover:text-white rounded-xl transition-all duration-150 cursor-pointer"
+                                title="Valider la réservation"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(r.id, 'ANNULEE')}
+                                className="p-2 bg-brand-error/10 hover:bg-brand-error text-brand-error hover:text-white rounded-xl transition-all duration-150 cursor-pointer"
+                                title="Refuser / Annuler"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Modal Détails Fiche de Réservation (Via React Portal Universel) */}

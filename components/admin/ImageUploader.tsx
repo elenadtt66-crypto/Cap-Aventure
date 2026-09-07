@@ -168,7 +168,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
       {/* Grille des photos actuelles */}
       {images.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           {images.map((img, idx) => {
             const isCover = idx === 0;
             return (
@@ -186,37 +186,45 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
                 {/* Badge Couverture sur la 1ère */}
                 {isCover && (
-                  <div className="absolute top-2 left-2">
+                  <div className="absolute top-2 left-2 z-10">
                     <Badge variant="gold" size="sm" icon={<Star className="w-3 h-3 fill-current" />}>
                       Principale
                     </Badge>
                   </div>
                 )}
 
-                {/* Overlay d'actions au survol */}
-                <div className="absolute inset-0 bg-brand-navy/70 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 p-2">
+                {/* Overlay d'actions sur Desktop (au hover) + Boutons permanents tactiles sur Mobile */}
+                <div className="absolute inset-0 bg-brand-navy/60 backdrop-blur-xs opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 p-2 pointer-events-auto">
                   {!isCover && (
                     <button
                       type="button"
-                      onClick={() => handleSetAsCover(idx)}
-                      className="p-2 bg-white text-brand-navy hover:bg-brand-accent hover:text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSetAsCover(idx);
+                      }}
+                      className="p-2 bg-white/95 text-brand-navy hover:bg-brand-accent hover:text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 min-w-[34px] min-h-[34px] flex items-center justify-center"
                       title="Définir comme photo de couverture"
+                      aria-label="Définir comme photo de couverture"
                     >
                       <Star className="w-4 h-4" />
                     </button>
                   )}
                   <button
                     type="button"
-                    onClick={() => handleRemoveImage(idx)}
-                    className="p-2 bg-brand-error text-white hover:bg-red-700 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveImage(idx);
+                    }}
+                    className="p-2 bg-brand-error text-white hover:bg-red-700 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 min-w-[34px] min-h-[34px] flex items-center justify-center"
                     title="Supprimer cette photo"
+                    aria-label="Supprimer cette photo"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
                 {/* Numéro d'ordre */}
-                <div className="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md text-[9px] font-mono text-white">
+                <div className="absolute bottom-1.5 right-1.5 bg-black/70 backdrop-blur-sm px-1.5 py-0.5 rounded-md text-[9px] font-mono text-white pointer-events-none">
                   #{idx + 1}
                 </div>
               </div>
@@ -232,10 +240,10 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
+        className={`border-2 border-dashed rounded-2xl p-4 sm:p-6 text-center cursor-pointer transition-all duration-200 ${
           dragActive
             ? 'border-brand-accent bg-brand-gold-light/40 scale-[1.01]'
-            : 'border-brand-border hover:border-brand-accent/60 bg-brand-beige/50 hover:bg-brand-hover/80'
+            : 'border-brand-border hover:border-brand-accent/60 bg-brand-beige/50 hover:bg-brand-hover/80 active:bg-brand-hover'
         }`}
       >
         <input
@@ -248,22 +256,23 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         />
         <div className="flex flex-col items-center space-y-2">
           <div className="p-3 bg-white rounded-2xl shadow-sm text-brand-accent border border-brand-border">
-            <Upload className="w-6 h-6" />
+            <Upload className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-bold text-brand-text">
-              Glissez-déposez vos photos ici, ou <span className="text-brand-accent underline">parcourez vos fichiers</span>
+              <span className="sm:hidden">Touchez pour prendre une photo ou choisir un fichier</span>
+              <span className="hidden sm:inline">Glissez-déposez vos photos ici, ou <span className="text-brand-accent underline">parcourez vos fichiers</span></span>
             </p>
             <p className="text-[11px] text-brand-muted mt-0.5">
-              PNG, JPG, WEBP jusqu'à 10 Mo par photo (sélection multiple supportée)
+              PNG, JPG, WEBP • Compression auto optimisée smartphone & réseau mobile
             </p>
           </div>
         </div>
       </div>
 
       {/* Ajout manuel par URL */}
-      <div className="space-y-2 pt-1">
-        <div className="flex gap-2">
+      <div className="space-y-2.5 pt-1">
+        <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-brand-muted">
               <ImageIcon className="w-4 h-4" />
@@ -278,7 +287,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
                   handleAddUrl();
                 }
               }}
-              placeholder="Ou collez une URL directe d'image (ex: https://images.unsplash.com/...)"
+              placeholder="Ou collez une URL directe (https://...)"
               className="w-full pl-9 pr-4 py-2.5 bg-brand-beige border border-brand-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/30 text-xs font-mono"
             />
           </div>
@@ -288,6 +297,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
             size="sm"
             onClick={() => handleAddUrl()}
             leftIcon={<Plus className="w-3.5 h-3.5" />}
+            className="w-full sm:w-auto justify-center"
           >
             Ajouter URL
           </Button>
@@ -295,7 +305,9 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
         {/* Suggestions d'images prédéfinies HD */}
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          <span className="text-[10px] text-brand-muted font-bold">Photos suggérées :</span>
+          <span className="text-[10px] text-brand-muted font-bold block w-full sm:w-auto mb-1 sm:mb-0">
+            Photos suggérées :
+          </span>
           {sampleImages.map((sample, idx) => (
             <button
               key={idx}
@@ -305,7 +317,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
                   onChange([...images, sample.url]);
                 }
               }}
-              className="px-2.5 py-1 bg-white hover:bg-brand-gold-light border border-brand-border hover:border-brand-accent/40 rounded-lg text-[10px] font-semibold text-brand-text transition-all cursor-pointer shadow-2xs"
+              className="px-2.5 py-1.5 bg-white hover:bg-brand-gold-light active:bg-brand-gold-light border border-brand-border hover:border-brand-accent/40 rounded-lg text-[10px] font-semibold text-brand-text transition-all cursor-pointer shadow-2xs min-h-[30px]"
             >
               {sample.label}
             </button>
