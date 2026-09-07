@@ -172,6 +172,9 @@ export const MOCK_VEHICLES: Vehicle[] = inMemoryVehicles;
 // ==========================================
 
 export async function getVehicles(): Promise<Vehicle[]> {
+  const baseVehicles = [...(cleanVehiclesDataset as Vehicle[])];
+  let supabaseVehicles: Vehicle[] = [];
+
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -179,8 +182,8 @@ export async function getVehicles(): Promise<Vehicle[]> {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (data && data.length > 0) {
-        return data.map((v: any) => ({
+      if (data && Array.isArray(data)) {
+        supabaseVehicles = data.map((v: any) => ({
           id: v.id,
           slug: v.slug || '',
           name: v.name || '',
@@ -215,144 +218,25 @@ export async function getVehicles(): Promise<Vehicle[]> {
     }
   }
 
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const q = query(collection(db, 'vehicles'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-      const list: Vehicle[] = [];
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        list.push({
-          id: docSnap.id,
-          slug: data.slug || '',
-          name: data.name || '',
-          type: data.type || 'van_amenege',
-          description: data.description || '',
-          pricePerDay: data.pricePerDay || 0,
-          seats: data.seats || 2,
-          beds: data.beds || 2,
-          features: data.features || [],
-          images: data.images || [],
-          available: data.available !== false,
-          location: data.location || 'Bordeaux',
-          owner: data.owner || {
-            name: 'Propriétaire',
-            avatar: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=150&q=80',
-            responseTime: 'En moins d\'une heure',
-            responseRate: 100
-          },
-          techSpecs: data.techSpecs || {
-            fuel: 'Diesel',
-            transmission: 'Manuelle',
-            consumption: '8L/100km',
-            enginePower: '130 ch'
-          },
-          rating: data.rating || 5.0,
-          reviewCount: data.reviewCount || 0,
-          reviews: data.reviews || [],
-        });
-      });
-      if (list.length > 0) return list;
-    }
-  } catch (error) {
-    // Fallback local
-  }
+  // Fusionner les véhicules de base, locaux et Supabase (Supabase ayant la priorité)
+  const localVehicles = getStoredVehicles();
+  const allMap = new Map<string, Vehicle>();
 
-  return getStoredVehicles();
+  // 1. Ajouter d'abord le catalogue de base et le stockage local
+  baseVehicles.forEach(v => allMap.set(v.id, v));
+  localVehicles.forEach(v => allMap.set(v.id, v));
+
+  // 2. Ajouter/Surmonter avec les véhicules Supabase synchronisés
+  supabaseVehicles.forEach(v => allMap.set(v.id, v));
+
+  return Array.from(allMap.values());
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   const cleanSlug = decodeURIComponent(slug || '').trim().toLowerCase();
-  const storedVehicles = getStoredVehicles();
+  const allVehicles = await getVehicles();
 
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .or(`slug.eq.${slug},id.eq.${slug}`)
-        .limit(1);
-
-      if (data && data.length > 0) {
-        const v = data[0];
-        return {
-          id: v.id,
-          slug: v.slug || '',
-          name: v.name || '',
-          type: v.type || 'van_amenege',
-          description: v.description || '',
-          pricePerDay: v.price_per_day ?? v.pricePerDay ?? 0,
-          seats: v.seats || 2,
-          beds: v.beds || 2,
-          features: v.features || [],
-          images: v.images || [],
-          available: v.available !== false,
-          location: v.location || 'Bordeaux',
-          owner: v.owner || {
-            name: 'Cap Aventure Agence',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-            responseTime: 'En moins d\'une heure',
-            responseRate: 100
-          },
-          techSpecs: v.tech_specs ?? v.techSpecs ?? {
-            fuel: 'Diesel',
-            transmission: 'Manuelle',
-            consumption: '8L/100km',
-            enginePower: '130 ch'
-          },
-          rating: v.rating || 5.0,
-          reviewCount: v.review_count ?? v.reviewCount ?? 0,
-          reviews: v.reviews || [],
-        };
-      }
-    } catch (sbErr) {
-      console.warn('Supabase fetch vehicle by slug error:', sbErr);
-    }
-  }
-
-  try {
-    if (db && db.app?.options?.projectId && db.app.options.projectId !== 'mock-project-id') {
-      const q = query(collection(db, 'vehicles'), where('slug', '==', slug));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        const docSnap = querySnapshot.docs[0];
-        const data = docSnap.data();
-        return {
-          id: docSnap.id,
-          slug: data.slug || '',
-          name: data.name || '',
-          type: data.type || 'van_amenege',
-          description: data.description || '',
-          pricePerDay: data.pricePerDay || 0,
-          seats: data.seats || 2,
-          beds: data.beds || 2,
-          features: data.features || [],
-          images: data.images || [],
-          available: data.available !== false,
-          location: data.location || 'Bordeaux',
-          owner: data.owner || {
-            name: 'Cap Aventure Agence',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-            responseTime: 'En moins d\'une heure',
-            responseRate: 100
-          },
-          techSpecs: data.techSpecs || {
-            fuel: 'Diesel',
-            transmission: 'Manuelle',
-            consumption: '8L/100km',
-            enginePower: '130 ch'
-          },
-          rating: data.rating || 5.0,
-          reviewCount: data.reviewCount || 0,
-          reviews: data.reviews || [],
-        };
-      }
-    }
-  } catch (firestoreErr) {
-    // Fallback local
-  }
-
-  const found = storedVehicles.find(
+  const found = allVehicles.find(
     v => v.slug.toLowerCase() === cleanSlug || 
          v.id.toLowerCase() === cleanSlug ||
          v.slug.toLowerCase().includes(cleanSlug) ||
