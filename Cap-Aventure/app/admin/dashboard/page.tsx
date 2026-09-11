@@ -150,7 +150,7 @@ export default function Dashboard() {
           loading={loading}
           colorClass="bg-[#2563EB]/10 text-[#2563EB]"
           suffix=" €"
-          formatValue={(v) => v.toLocaleString('fr-FR')}
+          formatValue={(v: number) => v.toLocaleString('fr-FR')}
         />
       </div>
 
