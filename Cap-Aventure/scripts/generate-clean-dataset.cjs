@@ -1,0 +1,954 @@
+const fs = require('fs');
+const path = require('path');
+
+const vehicles = [
+  // =========================================================================
+  // 1. VANS AMÉNAGÉS (75€ à 115€ / jour) — Compacts, Toit Relevable, Polyvalents
+  // =========================================================================
+  {
+    id: "cap-van-01",
+    slug: "volkswagen-california-ocean-t61-bordeaux",
+    name: "Volkswagen California Ocean T6.1",
+    type: "van_amenege",
+    description: "Le van mythique par excellence dans sa version la plus haut de gamme. Toit relevable électro-hydraulique avec sommier à coupelles, cuisine intérieure 2 feux, frigo à compression 42L, store banne et mobilier extérieur rangé dans le hayon. Idéal pour sillonner la côte Atlantique ou les Pyrénées en toute liberté.",
+    pricePerDay: 95,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Toit relevable électrique",
+      "Cuisine 2 feux & Évier inox",
+      "Frigo à compression 42L",
+      "Chauffage stationnaire Webasto",
+      "Douchette extérieure",
+      "Store latéral extérieur",
+      "Table & chaises de camping intégrées",
+      "Régulateur adaptatif & Caméra de recul"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_1.png"
+    ],
+    available: true,
+    location: "Bordeaux (33000)",
+    owner: {
+      name: "Marc & Clara",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "7.4L/100km",
+      enginePower: "150 ch (DSG7)"
+    },
+    rating: 4.95,
+    reviewCount: 38,
+    reviews: [
+      { id: "rev-v1-1", author: "Maxime D.", date: "Juillet 2025", rating: 5, comment: "Van impeccable, très propre et super bien équipé pour notre roadtrip au Pays Basque." },
+      { id: "rev-v1-2", author: "Céline B.", date: "Mai 2025", rating: 5, comment: "Marc et Clara sont adorables et prennent le temps de tout expliquer. Voyage inoubliable !" }
+    ]
+  },
+  {
+    id: "cap-van-02",
+    slug: "mercedes-marco-polo-v250d-biarritz",
+    name: "Mercedes-Benz Marco Polo V250d AMG",
+    type: "van_amenege",
+    description: "L'élégance et le raffinement de la marque à l'étoile. Finitions intérieures façon yacht de luxe avec plancher façon pont de bateau en bois clair, sellerie cuir Lugano et système multimédia MBUX avec écran tactile. Le confort de conduite d'une berline premium avec l'autonomie d'un van de rêve.",
+    pricePerDay: 110,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Toit relevable électrique Easy Up",
+      "Plancher intérieur style Yacht",
+      "Bloc cuisine finition laquée",
+      "Frigo 40L & Cuisinière 2 feux",
+      "Climatisation automatique multizone",
+      "Suspension pneumatique Agility Control",
+      "Pack d'assistance au stationnement 360°",
+      "Éclairage d'ambiance LED personnalisable"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1515876305430-f06edab8282a?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1533873984035-25970ab07461?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_2.png"
+    ],
+    available: true,
+    location: "Biarritz (64200)",
+    owner: {
+      name: "Alexandre",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins de 2 heures",
+      responseRate: 98
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "7.8L/100km",
+      enginePower: "190 ch 4Matic"
+    },
+    rating: 4.92,
+    reviewCount: 29,
+    reviews: [
+      { id: "rev-v2-1", author: "Thomas G.", date: "Août 2025", rating: 5, comment: "Un confort de conduite magistral sur les routes de montagne espagnoles !" }
+    ]
+  },
+  {
+    id: "cap-van-03",
+    slug: "ford-transit-custom-nugget-plus-nantes",
+    name: "Ford Transit Custom Nugget Plus",
+    type: "van_amenege",
+    description: "Le van rare doté d'un cabinet de toilette avec WC fixe intégré à l'arrière et lavabo escamotable. Son agencement 3 pièces breveté par Westfalia permet de cuisiner pendant que les enfants dorment dans le toit. Idéal pour ceux qui cherchent la discrétion d'un van avec le confort sanitaire.",
+    pricePerDay: 88,
+    seats: 5,
+    beds: 4,
+    features: [
+      "WC fixe intégré avec réservoir",
+      "Cuisine en L arrière spacieuse",
+      "Toit relevable avec lit grand confort",
+      "Douchette extérieure",
+      "2 portes coulissantes latérales",
+      "Chauffage stationnaire 3.5 kW",
+      "5 vraies places carte grise",
+      "Attelage pour porte-vélos"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_1.png"
+    ],
+    available: true,
+    location: "Nantes (44000)",
+    owner: {
+      name: "Chloé & Julien",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 30 minutes",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "8.1L/100km",
+      enginePower: "185 ch EcoBlue"
+    },
+    rating: 4.86,
+    reviewCount: 22,
+    reviews: [
+      { id: "rev-v3-1", author: "Sophie T.", date: "Septembre 2025", rating: 5, comment: "Le WC arrière est un vrai game changer en famille avec des enfants en bas âge." }
+    ]
+  },
+  {
+    id: "cap-van-04",
+    slug: "renault-trafic-spacenomad-toulouse",
+    name: "Renault Trafic SpaceNomad Iconic",
+    type: "van_amenege",
+    description: "Fabriqué en France par les maîtres aménageurs de Pilote, ce SpaceNomad offre un salon spacieux avec banquette coulissante et toit ouvrant panoramique. Très sobre, agile et parfaitement insonorisé pour voyager sur les routes d'Occitanie.",
+    pricePerDay: 80,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Toit relevable avec panneau solaire",
+      "Réfrigérateur 49L grande capacité",
+      "Banquette sur rails modulable",
+      "Douchette arrière eau tempérée",
+      "Éclairage full LED avec variateurs",
+      "Système multimédia Easy Link avec navigation",
+      "Isolation thermique renforcée laine de chanvre"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1508873696983-2df57046475a?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_2.png"
+    ],
+    available: true,
+    location: "Toulouse (31000)",
+    owner: {
+      name: "Guillaume",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 1 heure",
+      responseRate: 97
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "7.1L/100km",
+      enginePower: "150 ch dCi"
+    },
+    rating: 4.82,
+    reviewCount: 17,
+    reviews: [
+      { id: "rev-v4-1", author: "Arnaud L.", date: "Juin 2025", rating: 5, comment: "Consommation très raisonnable et conduite très douce." }
+    ]
+  },
+  {
+    id: "cap-van-05",
+    slug: "citroen-campster-spacetourer-lyon",
+    name: "Citroën SpaceTourer Campster Pössl",
+    type: "van_amenege",
+    description: "Le van compact passe-partout avec bloc cuisine amovible ! Vous pouvez sortir la cuisine à l'extérieur pour cuisiner sous les étoiles. Avec sa hauteur sous les 1m96, il accède à tous les parkings souterrains et routes côtières.",
+    pricePerDay: 75,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Bloc cuisine amovible pour extérieur",
+      "Hauteur < 1.96m (classe 1 péages)",
+      "Portes latérales coulissantes gauche et droite",
+      "Toit relevable panoramique ouverture totale",
+      "Lit toit confort avec coupelles Froli",
+      "Climatisation automatique bi-zone",
+      "Grip Control pour chemins de terre"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_1.png"
+    ],
+    available: true,
+    location: "Lyon (69000)",
+    owner: {
+      name: "Valérie & Paul",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 99
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "6.9L/100km",
+      enginePower: "145 ch BlueHDi"
+    },
+    rating: 4.88,
+    reviewCount: 31,
+    reviews: [
+      { id: "rev-v5-1", author: "Damien V.", date: "Mai 2025", rating: 5, comment: "Superbe agilité, la cuisine en plein air est une trouvaille géniale !" }
+    ]
+  },
+  {
+    id: "cap-van-06",
+    slug: "peugeot-expert-crosscamp-annecy",
+    name: "Crosscamp Flex Peugeot Expert",
+    type: "van_amenege",
+    description: "Préparé pour les amoureux de la montagne et des activités outdoor. Équipé d'un porte-vélos sur hayon, d'une transmission motricité renforcée et de couchages ultra-confortables avec vue panoramique sur le lac d'Annecy et les sommets alpins.",
+    pricePerDay: 82,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Toit relevable ouverture 180° vue montagne",
+      "Porte-vélos 3 vélos inclus",
+      "Chauffage d'appoint programmable",
+      "Glacière à compression 36L",
+      "Réservoirs eau propre & usée 10L",
+      "Kit mobilier outdoor avec tapis de sol",
+      "Pneus 4 saisons homologués montagne"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/van_2.png"
+    ],
+    available: true,
+    location: "Annecy (74000)",
+    owner: {
+      name: "Lucas",
+      avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 2 heures",
+      responseRate: 95
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "7.0L/100km",
+      enginePower: "145 ch"
+    },
+    rating: 4.90,
+    reviewCount: 24,
+    reviews: [
+      { id: "rev-v6-1", author: "Caroline M.", date: "Juillet 2025", rating: 5, comment: "Parfait pour visiter la Haute-Savoie et passer les cols sans difficulté." }
+    ]
+  },
+
+  // =========================================================================
+  // 2. FOURGONS AMÉNAGÉS (105€ à 140€ / jour) — Confort Sanitaire & Compacité
+  // =========================================================================
+  {
+    id: "cap-fourgon-01",
+    slug: "possl-summit-640-prime-bordeaux",
+    name: "Pössl Summit 640 Prime Skyroof",
+    type: "fourgon_amenege",
+    description: "Le modèle premium de référence chez Pössl. Grande verrière panoramique Skyroof ouvrant au-dessus du salon, lits jumeaux arrière king-size et salle de bain pivotante Vario qui isole parfaitement la cabine de douche. Idéal pour un couple exigeant.",
+    pricePerDay: 125,
+    seats: 4,
+    beds: 3,
+    features: [
+      "Verrière panoramique avant Skyroof",
+      "Lits jumeaux arrière (200x80cm chacun)",
+      "Salle de bain Vario à paroi pivotante",
+      "Grand réfrigérateur à double ouverture 100L",
+      "Chauffage Truma Combi 4 Diesel/Gaz",
+      "Batterie Lithium 100Ah & Panneau solaire 140W",
+      "Grande soute sous lit réglable",
+      "Store extérieur anthracite & Éclairage gouttière LED"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/fourgon_1.png",
+      "/images/vehicles/living_interior.png"
+    ],
+    available: true,
+    location: "Bordeaux (33000)",
+    owner: {
+      name: "Bernard & Monique",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "8.6L/100km",
+      enginePower: "160 ch Fiat Ducato 9G"
+    },
+    rating: 4.96,
+    reviewCount: 42,
+    reviews: [
+      { id: "rev-f1-1", author: "Patrick R.", date: "Septembre 2025", rating: 5, comment: "Le skyroof inonde l'intérieur de lumière naturelle. Les lits jumeaux sont très confortables." },
+      { id: "rev-f1-2", author: "Hélène S.", date: "Août 2025", rating: 5, comment: "Bernard est d'une grande gentillesse et le fourgon est dans un état neuf irréprochable." }
+    ]
+  },
+  {
+    id: "cap-fourgon-02",
+    slug: "adria-twin-supreme-640-sgx-marseille",
+    name: "Adria Twin Supreme 640 SGX",
+    type: "fourgon_amenege",
+    description: "Le fourgon ultime pour les sportifs et baroudeurs. Équipé d'un lit arrière élévateur électrique permettant de charger des vélos de route, des planches de kitesurf ou du matériel de plongée dans une immense soute en aluminium strié.",
+    pricePerDay: 130,
+    seats: 4,
+    beds: 3,
+    features: [
+      "Lit arrière à élévation électrique",
+      "Immense soute sportive avec anneaux d'arrimage",
+      "Toit panoramique SunRoof exclusif",
+      "Cabinet de toilette Duplex pivotant",
+      "Store banne Thule Omnistor",
+      "Isolation phonique et thermique thermo-acoustique",
+      "Réservoir d'eaux usées chauffé et isolé",
+      "Caméra de recul double optique"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/fourgon_2.png"
+    ],
+    available: true,
+    location: "Marseille (13000)",
+    owner: {
+      name: "Adrien & Julie",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 1 heure",
+      responseRate: 98
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "8.9L/100km",
+      enginePower: "180 ch Fiat Ducato"
+    },
+    rating: 4.91,
+    reviewCount: 34,
+    reviews: [
+      { id: "rev-f2-1", author: "Vincent K.", date: "Juillet 2025", rating: 5, comment: "Nous avons pu transporter nos 2 VTT électriques à l'intérieur en toute sécurité." }
+    ]
+  },
+  {
+    id: "cap-fourgon-03",
+    slug: "dreamer-d55-exclusive-rennes",
+    name: "Dreamer D55 Exclusive (Groupe Rapido)",
+    type: "fourgon_amenege",
+    description: "Le best-seller du fourgon avec douche entièrement indépendante du cabinet de toilette grâce au système breveté de penderie Modul'Space. Longueur de 5,99 m très maniable pour les étapes citadines comme les villages côtiers de Bretagne.",
+    pricePerDay: 118,
+    seats: 4,
+    beds: 3,
+    features: [
+      "Douche indépendante avec porte rigide",
+      "Système breveté de penderie pivotante Modul'Space",
+      "Longueur compacte 5,99m",
+      "Grand lit transversal 195x132cm",
+      "Réfrigérateur AES 133L",
+      "Double plancher technique avec rangements",
+      "Chauffage Truma Combi 4",
+      "Panneau solaire 130W"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/fourgon_1.png"
+    ],
+    available: true,
+    location: "Rennes (35000)",
+    owner: {
+      name: "François",
+      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "8.2L/100km",
+      enginePower: "140 ch Peugeot Boxer"
+    },
+    rating: 4.87,
+    reviewCount: 26,
+    reviews: [
+      { id: "rev-f3-1", author: "Mélanie P.", date: "Août 2025", rating: 5, comment: "La vraie douche séparée est un luxe incroyable dans un fourgon de moins de 6 mètres !" }
+    ]
+  },
+  {
+    id: "cap-fourgon-04",
+    slug: "font-vendome-leader-camp-toulouse",
+    name: "Font Vendôme Leader Camp Duo",
+    type: "fourgon_amenege",
+    description: "Aménagement haut de gamme par le spécialiste historique français Font Vendôme. Isolation thermique intégrale mousse de polyuréthane projetée et double batterie auxiliaire pour une autonomie totale hors réseau.",
+    pricePerDay: 112,
+    seats: 4,
+    beds: 3,
+    features: [
+      "Isolation thermo-acoustique intégrale haute densité",
+      "2 batteries auxiliaires 100Ah gel + convertisseur 220V",
+      "Cuisine ergonomique avec plan de travail extensible",
+      "Lit transversal arrière sur sommier à lattes relevable",
+      "Moustiquaire de porte latérale plissée",
+      "Marchepied électrique grande largeur",
+      "Douchette extérieure chaud/froid"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1508873696983-2df57046475a?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/fourgon_2.png"
+    ],
+    available: true,
+    location: "Toulouse (31000)",
+    owner: {
+      name: "Stéphane",
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 2 heures",
+      responseRate: 96
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "8.4L/100km",
+      enginePower: "140 ch Fiat Ducato"
+    },
+    rating: 4.84,
+    reviewCount: 19,
+    reviews: [
+      { id: "rev-f4-1", author: "Benoît C.", date: "Mai 2025", rating: 5, comment: "Véhicule très autonome, nous n'avons pas eu besoin de brancher en camping pendant 4 jours." }
+    ]
+  },
+  {
+    id: "cap-fourgon-05",
+    slug: "knaus-boxstar-600-street-strasbourg",
+    name: "Knaus Boxstar 600 Street XL",
+    type: "fourgon_amenege",
+    description: "La rigueur et la qualité de fabrication allemande Knaus. Toit surélevé rigide d'origine offrant un vrai lit de pavillon pour accueillir 4 adultes confortablement sans aucune manipulation de table.",
+    pricePerDay: 135,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Toit rehaussé rigide XL (hauteur intérieure 2.18m)",
+      "2 grands lits doubles permanents (4 adultes)",
+      "Chauffage au gazole Truma Combi 6D",
+      "Réfrigérateur 90L à compression",
+      "Isolation XPS certifiée classe 3 pour l'hiver",
+      "Système audio surround avec caisson de basses",
+      "Jantes alliage 16 pouces & Pack sécurité active"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/fourgon_1.png"
+    ],
+    available: true,
+    location: "Strasbourg (67000)",
+    owner: {
+      name: "Klaus & Marie",
+      avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "9.1L/100km",
+      enginePower: "160 ch Fiat Ducato"
+    },
+    rating: 4.93,
+    reviewCount: 30,
+    reviews: [
+      { id: "rev-f5-1", author: "Élodie F.", date: "Octobre 2025", rating: 5, comment: "Parfait pour notre escapade en Forêt-Noire et en Alsace, le chauffage gazole est ultra efficace." }
+    ]
+  },
+
+  // =========================================================================
+  // 3. CAMPING-CARS PROFILÉS (135€ à 170€ / jour) — Espace & Grand Confort Familial
+  // =========================================================================
+  {
+    id: "cap-profile-01",
+    slug: "challenger-260-graphite-edition-paris",
+    name: "Challenger 260 Graphite Ultimate",
+    type: "camping_car_profile",
+    description: "Le plan le plus primé d'Europe ! Salon face-face géant SmartLounge pour 6 convives, lit de pavillon 160x200cm escamotable au plafond d'une simple pression sur un bouton, et immense salle de bain arrière avec dressing dressing-room.",
+    pricePerDay: 148,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Salon face-à-face SmartLounge XXL",
+      "Lit pavillon électrique 160x200cm",
+      "Grande salle de bain transversale arrière avec douche séparée",
+      "Dressing géant avec penderie éclairée",
+      "Réfrigérateur 167L avec sélection automatique d'énergie",
+      "Garage arrière chauffé avec 2 grands portillons d'accès",
+      "Store extérieur banne 4m avec éclairage LED",
+      "Caméra de recul & Panneau solaire 140W"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/profile_1.png",
+      "/images/vehicles/living_interior.png"
+    ],
+    available: true,
+    location: "Paris / Versailles (78000)",
+    owner: {
+      name: "Estelle & Thierry",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 1 heure",
+      responseRate: 99
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "9.4L/100km",
+      enginePower: "170 ch Ford Transit"
+    },
+    rating: 4.94,
+    reviewCount: 45,
+    reviews: [
+      { id: "rev-p1-1", author: "Julien M.", date: "Septembre 2025", rating: 5, comment: "Camping-car d'un confort exceptionnel. Le salon est gigantesque et le lit se baisse en 5 secondes !" },
+      { id: "rev-p1-2", author: "Sandrine L.", date: "Juillet 2025", rating: 5, comment: "Propreté chirurgicale et explications au top par Estelle. À refaire sans hésiter." }
+    ]
+  },
+  {
+    id: "cap-profile-02",
+    slug: "rapido-686f-series-lyon",
+    name: "Rapido 686F Série 60 Ans",
+    type: "camping_car_profile",
+    description: "L'art de vivre à la française selon Rapido. Magnifique chambre arrière avec lit central king-size réglable en hauteur, ambiance feutrée avec mobilier bois Nacarat et plan de travail résine minérale.",
+    pricePerDay: 160,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Grand lit central XXL (160x196cm) réglable en hauteur électriquement",
+      "Lit pavillon escamotable 2 places avant",
+      "Douche indépendante avec caillebotis bois",
+      "Salon ouvert avec banquettes face-à-face",
+      "Chauffage Truma Combi 6 EH (Gaz + Électricité 220V)",
+      "TV connectée Smart TV 22 pouces orientable",
+      "Porte-vélos 3 vélos (dont 2 électriques)",
+      "Antenne satellite automatique"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/profile_1.png"
+    ],
+    available: true,
+    location: "Lyon (69000)",
+    owner: {
+      name: "Gérard",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 2 heures",
+      responseRate: 96
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "9.6L/100km",
+      enginePower: "160 ch Fiat Ducato"
+    },
+    rating: 4.89,
+    reviewCount: 33,
+    reviews: [
+      { id: "rev-p2-1", author: "Michel T.", date: "Août 2025", rating: 5, comment: "Le lit central est aussi confortable que notre lit à la maison. Finitions superbes." }
+    ]
+  },
+  {
+    id: "cap-profile-03",
+    slug: "dethleffs-trend-t7057-eb-nantes",
+    name: "Dethleffs Trend T7057 EB",
+    type: "camping_car_profile",
+    description: "Le confort haut de gamme allemand avec de grands lits jumeaux arrière sur soute garage géante pouvant accueillir jusqu'à 4 vélos et du mobilier de jardin.",
+    pricePerDay: 155,
+    seats: 4,
+    beds: 5,
+    features: [
+      "Lits jumeaux arrière XXL transformables en lit 3 places",
+      "Lit pavillon électrique avant",
+      "Salle de bain avec cloison rotative ergonomique",
+      "Chauffage Truma Combi 6",
+      "Isolation thermique hivernale AirPlus",
+      "Grand store extérieur Thule 4.5m",
+      "Panneaux solaires 160W",
+      "GPS spécial gabarit camping-car"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/profile_1.png"
+    ],
+    available: true,
+    location: "Nantes (44000)",
+    owner: {
+      name: "Julien & Marine",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "9.2L/100km",
+      enginePower: "140 ch Fiat Ducato"
+    },
+    rating: 4.92,
+    reviewCount: 28,
+    reviews: [
+      { id: "rev-p3-1", author: "David P.", date: "Juin 2025", rating: 5, comment: "Très facile à prendre en main malgré son gabarit, et la soute est immense." }
+    ]
+  },
+  {
+    id: "cap-profile-04",
+    slug: "pilote-p740c-evidence-bordeaux",
+    name: "Pilote Pacific P740C Évidence",
+    type: "camping_car_profile",
+    description: "Le profilé familial complet par excellence avec ses équipements haut de gamme inclus : lit central rétractable, salon convivial en L, cuisine spacieuse avec tiroirs à fermeture amortie et panneau solaire d'origine.",
+    pricePerDay: 142,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Lit central rétractable avec sommier articulé",
+      "Cuisine en L avec grand plan de travail",
+      "Douche indépendante thermo-moulée",
+      "Chauffage air pulsé Truma Combi 4",
+      "Batterie AGM haute performance",
+      "Caméra de recul grand angle",
+      "Pack média avec écran 9 pouces Apple CarPlay & Android Auto"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/profile_1.png"
+    ],
+    available: true,
+    location: "Bordeaux (33000)",
+    owner: {
+      name: "Sébastien",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 1 heure",
+      responseRate: 98
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Manuelle",
+      consumption: "9.3L/100km",
+      enginePower: "140 ch Citroën Jumper"
+    },
+    rating: 4.88,
+    reviewCount: 25,
+    reviews: [
+      { id: "rev-p4-1", author: "Sylvie G.", date: "Septembre 2025", rating: 5, comment: "Véhicule très propre, très bien agencé pour 4 personnes." }
+    ]
+  },
+  {
+    id: "cap-profile-05",
+    slug: "chausson-640-titanium-premium-nice",
+    name: "Chausson 640 Titanium Ultimate",
+    type: "camping_car_profile",
+    description: "Édition spéciale Titanium avec carrosserie gris taupe métallisée, boîte automatique séquentielle, salon SmartLounge et salle de bain avec accès direct à la soute garage. Un profilé compact (6,99 m) parfait pour la Côte d'Azur.",
+    pricePerDay: 152,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Boîte automatique Ford 6 rapports ultra douce",
+      "Lit de pavillon 160x200cm escamotable",
+      "Grand dressing arrière avec tiroirs et penderies",
+      "Chauffage sur carburant utilisable en roulant",
+      "Système de couchage d'appoint salon",
+      "Prise gaz extérieure pour barbecue & plancha",
+      "Prise douchette extérieure dans la soute"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1515876305430-f06edab8282a?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/profile_1.png"
+    ],
+    available: true,
+    location: "Nice (06000)",
+    owner: {
+      name: "Olivier & Cathy",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 30 minutes",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "9.5L/100km",
+      enginePower: "170 ch Ford EcoBlue"
+    },
+    rating: 4.95,
+    reviewCount: 39,
+    reviews: [
+      { id: "rev-p5-1", author: "Christophe R.", date: "Août 2025", rating: 5, comment: "La boîte automatique sur les routes de l'arrière-pays niçois est un vrai bonheur !" }
+    ]
+  },
+
+  // =========================================================================
+  // 4. GRANDS CAMPING-CARS INTÉGRAUX (175€ à 245€ / jour) — Palace Roulant & Prestige
+  // =========================================================================
+  {
+    id: "cap-integral-01",
+    slug: "hymer-b-class-masterline-i780-lyon",
+    name: "Hymer B-Class MasterLine I 780",
+    type: "camping_car_integral",
+    description: "Le sommet du véhicule de loisirs mondial. Châssis SLC double plancher exclusif, isolation PUAL 2.0 sans pont thermique, chauffage central à eau chaude Alde et pare-brise panoramique gigantesque offrant une vue théâtrale sur la route.",
+    pricePerDay: 235,
+    seats: 4,
+    beds: 5,
+    features: [
+      "Chauffage central Alde avec convecteurs et plancher chauffant",
+      "Châssis double plancher SLC isolé et chauffé",
+      "Pare-brise panoramique athermique avec stores plissés électriques",
+      "Lit central Queen Size (160x200cm) à réglage électrique",
+      "Lit pavillon cabine intégré invisible au plafond",
+      "Cuisine de chef avec four gaz combiné et hotte aspirante",
+      "Système de caméras BirdView 360° pour manœuvrer sans stress",
+      "Convertisseur 220V 1800W onde pure & Pack batteries Lithium 150Ah",
+      "Climatisation cellule de toit silencieuse Truma Aventa"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/integral_1.png",
+      "/images/vehicles/living_interior.png"
+    ],
+    available: true,
+    location: "Lyon (69000)",
+    owner: {
+      name: "Jean-Pierre & Françoise",
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "11.2L/100km",
+      enginePower: "177 ch Mercedes Sprinter 9G-Tronic"
+    },
+    rating: 4.98,
+    reviewCount: 27,
+    reviews: [
+      { id: "rev-i1-1", author: "Guillaume P.", date: "Septembre 2025", rating: 5, comment: "Un véritable hôtel 5 étoiles sur roues. Le silence de conduite sur autoroute est bluffant." },
+      { id: "rev-i1-2", author: "Dominique B.", date: "Juin 2025", rating: 5, comment: "Jean-Pierre est un passionné qui prend le temps de faire un tour complet du véhicule. Expérience extraordinaire." }
+    ]
+  },
+  {
+    id: "cap-integral-02",
+    slug: "carthago-chic-c-line-i49-bordeaux",
+    name: "Carthago Chic c-line I 4.9 LE",
+    type: "camping_car_integral",
+    description: "L'élégance et la robustesse de la marque allemande Carthago. Carrosserie premium sans ossature bois, lits jumeaux arrière d'une dimension royale, salon en L luxueux avec table en bois précieux et isolation phonique incomparable.",
+    pricePerDay: 245,
+    seats: 4,
+    beds: 5,
+    features: [
+      "Construction de carrosserie issue de la technologie aéronautique",
+      "Double plancher technique avec soutes profondes traversantes",
+      "Lits jumeaux XXL avec sommier 7 zones et matelas mousse haute résilience",
+      "Cabine de douche indépendante ronde de type wellness",
+      "Réfrigérateur 153L avec compartiment freezer séparé",
+      "Suspension avant renforcée & Régulateur de vitesse adaptatif",
+      "Système de vérins hydrauliques automatiques de mise à niveau au sol",
+      "Panneau solaire 200W & Onduleur 2000W"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/integral_1.png"
+    ],
+    available: true,
+    location: "Bordeaux (33000)",
+    owner: {
+      name: "Henri",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 2 heures",
+      responseRate: 98
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "10.8L/100km",
+      enginePower: "180 ch Fiat Ducato Heavy"
+    },
+    rating: 4.96,
+    reviewCount: 31,
+    reviews: [
+      { id: "rev-i2-1", author: "Philippe V.", date: "Août 2025", rating: 5, comment: "Les vérins hydrauliques automatiques sont un pur régal à chaque étape du voyage." }
+    ]
+  },
+  {
+    id: "cap-integral-03",
+    slug: "rapido-distinction-i96-paris",
+    name: "Rapido Distinction i96 Prestige",
+    type: "camping_car_integral",
+    description: "Le fleuron de la gamme Distinction de Rapido. Face avant racée avec calandre chromée et feux full LED, lit central XXL king size (160x198cm), salon ouvert face-face et cuisine design avec mobilier blanc laqué.",
+    pricePerDay: 215,
+    seats: 4,
+    beds: 4,
+    features: [
+      "Lit central King Size (160x198cm) réglable en hauteur",
+      "Lit de cabine escamotable assisté",
+      "Chauffage central Alde avec convecteurs salon & chambre",
+      "Salle de bain traversante privative avec double porte de séparation",
+      "Feux avant 100% Full LED haute visibilité",
+      "Réservoir d'eau propre 130L isolé dans le double plancher",
+      "Grand store extérieur 5m avec télécommande et variateur LED",
+      "Store pare-brise électrique isotherme"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/integral_1.png"
+    ],
+    available: true,
+    location: "Paris / Fontainebleau (77300)",
+    owner: {
+      name: "Laurent",
+      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En moins d'une heure",
+      responseRate: 100
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "10.5L/100km",
+      enginePower: "180 ch Fiat Ducato"
+    },
+    rating: 4.93,
+    reviewCount: 21,
+    reviews: [
+      { id: "rev-i3-1", author: "Gilles M.", date: "Juillet 2025", rating: 5, comment: "Intérieur magnifique, digne d'un appartement parisien de grand standing." }
+    ]
+  },
+  {
+    id: "cap-integral-04",
+    slug: "pilote-galaxy-g740-evidence-nantes",
+    name: "Pilote Galaxy G740C Évidence",
+    type: "camping_car_integral",
+    description: "L'intégral familial spacieux et lumineux. Grande chambre parentale avec lit central, lit cabine escamotable préservant l'accès au salon, et visibilité de conduite incomparable grâce aux grands rétroviseurs suspendus type bus.",
+    pricePerDay: 190,
+    seats: 4,
+    beds: 5,
+    features: [
+      "Lit central électrique + Lit de cabine suspendu",
+      "Salon 5 places avec table portefeuille coulissante",
+      "Double porte de séparation jour/nuit",
+      "Isolation thermique certifiée niveau 3 hiver",
+      "Soute garage réglable en hauteur pouvant loger un scooter ou 3 vélos",
+      "Antenne satellite automatique + TV écran plat 24 pouces",
+      "Pack sécurité totale (ESP, Traction+, Hill Descent Control)"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/integral_1.png"
+    ],
+    available: true,
+    location: "Nantes (44000)",
+    owner: {
+      name: "Béatrice & Alain",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 1 heure",
+      responseRate: 99
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "10.2L/100km",
+      enginePower: "160 ch Fiat Ducato"
+    },
+    rating: 4.90,
+    reviewCount: 23,
+    reviews: [
+      { id: "rev-i4-1", author: "Yannick K.", date: "Mai 2025", rating: 5, comment: "Très bon intégral, la vision panoramique transforme la conduite en voyage." }
+    ]
+  },
+  {
+    id: "cap-integral-05",
+    slug: "dethleffs-globetrotter-xli-marseille",
+    name: "Dethleffs Globetrotter XLI 7850",
+    type: "camping_car_integral",
+    description: "Le géant de luxe de la marque Dethleffs. Poids lourd 5,4 tonnes avec double essieu arrière pour une stabilité impériale sur l'autoroute, salon circulaire monumental, et finitions artisanales en cuir pleine fleur.",
+    pricePerDay: 240,
+    seats: 4,
+    beds: 5,
+    features: [
+      "Châssis AL-KO tri-axe pour un comportement routier sans roulis",
+      "Chauffage central Alde avec régulation bi-zone",
+      "Double vitrage latéral cabine athermique et phonique",
+      "Cuisine professionnelle avec 3 feux, four et grill gaz",
+      "Soute garage XXL pouvant accueillir un quad ou 4 vélos électriques",
+      "Système d'alarme volumétrique et périmétrique",
+      "Climatisation automatique cabine & cellule séparée",
+      "Station multimédia Alpine 9 pouces avec système audio premium"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1513311068348-19c8fbdc0bb6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1515876305430-f06edab8282a?auto=format&fit=crop&w=1200&q=80",
+      "/images/vehicles/integral_1.png"
+    ],
+    available: true,
+    location: "Marseille (13000)",
+    owner: {
+      name: "Serge",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+      responseTime: "En 2 heures",
+      responseRate: 97
+    },
+    techSpecs: {
+      fuel: "Diesel",
+      transmission: "Automatique",
+      consumption: "12.0L/100km",
+      enginePower: "180 ch Fiat Ducato Maxi"
+    },
+    rating: 4.97,
+    reviewCount: 35,
+    reviews: [
+      { id: "rev-i5-1", author: "Claude H.", date: "Août 2025", rating: 5, comment: "Le double essieu arrière apporte une stabilité impressionnante même par grand vent." }
+    ]
+  }
+];
+
+fs.writeFileSync(
+  path.join(__dirname, '../data/yescapa-vehicles.json'),
+  JSON.stringify(vehicles, null, 2),
+  'utf8'
+);
+
+console.log(`Successfully generated ${vehicles.length} clean, unique, tiered-price vehicles.`);

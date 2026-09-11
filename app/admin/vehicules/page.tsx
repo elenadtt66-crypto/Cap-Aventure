@@ -270,13 +270,15 @@ export default function AdminVehicles() {
 
   const handleConfirmDelete = async () => {
     if (!vehicleToDelete) return;
+    const targetId = vehicleToDelete.id;
     setDeleting(true);
     try {
-      await deleteVehicle(vehicleToDelete.id);
+      await deleteVehicle(targetId);
+      setVehicles(prev => prev.filter(v => v.id !== targetId));
       setVehicleToDelete(null);
       await loadVehicles();
     } catch (err) {
-      console.error(err);
+      console.error('Erreur lors de la suppression du véhicule:', err);
     } finally {
       setDeleting(false);
     }

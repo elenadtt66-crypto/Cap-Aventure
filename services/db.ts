@@ -88,13 +88,34 @@ function saveStoredReservations(list: Reservation[]) {
   }
 }
 
+function getDeletedVehicleIds(): string[] {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('cap_aventure_deleted_vehicle_ids');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+    }
+  }
+  return [];
+}
+
+function saveDeletedVehicleIds(ids: string[]) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('cap_aventure_deleted_vehicle_ids', JSON.stringify(ids));
+    } catch (e) {}
+  }
+}
+
 function getStoredVehicles(): Vehicle[] {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('cap_aventure_vehicles');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= 0) return parsed;
       } catch (e) {
         console.error('Error parsing stored vehicles:', e);
       }
@@ -218,16 +239,24 @@ export async function getVehicles(): Promise<Vehicle[]> {
     }
   }
 
-  // Fusionner les véhicules de base, locaux et Supabase (Supabase ayant la priorité)
+  // Fusionner les véhicules de base, locaux et Supabase en excluant les véhicules supprimés
   const localVehicles = getStoredVehicles();
+  const deletedIds = new Set(getDeletedVehicleIds());
+
   const allMap = new Map<string, Vehicle>();
 
   // 1. Ajouter d'abord le catalogue de base et le stockage local
-  baseVehicles.forEach(v => allMap.set(v.id, v));
-  localVehicles.forEach(v => allMap.set(v.id, v));
+  baseVehicles.forEach(v => {
+    if (!deletedIds.has(v.id)) allMap.set(v.id, v);
+  });
+  localVehicles.forEach(v => {
+    if (!deletedIds.has(v.id)) allMap.set(v.id, v);
+  });
 
   // 2. Ajouter/Surmonter avec les véhicules Supabase synchronisés
-  supabaseVehicles.forEach(v => allMap.set(v.id, v));
+  supabaseVehicles.forEach(v => {
+    if (!deletedIds.has(v.id)) allMap.set(v.id, v);
+  });
 
   return Array.from(allMap.values());
 }
@@ -359,10 +388,19 @@ export async function updateVehicle(id: string, updatedFields: Partial<Vehicle>)
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
+  // 1. Enregistrer l'ID comme supprimé localement pour éviter qu'il réapparaisse
+  const deletedIds = getDeletedVehicleIds();
+  if (!deletedIds.includes(id)) {
+    deletedIds.push(id);
+    saveDeletedVehicleIds(deletedIds);
+  }
+
+  // 2. Filtrer la liste stockée en local
   const currentVehicles = getStoredVehicles();
   inMemoryVehicles = currentVehicles.filter(v => v.id !== id);
   saveStoredVehicles(inMemoryVehicles);
 
+  // 3. Supprimer dans Supabase si connecté
   if (supabase) {
     try {
       const { error } = await supabase
