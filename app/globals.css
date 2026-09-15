@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FAFBFC;
+  --foreground: #111827;
+
+  --brand-beige: #FAFBFC;
+  --brand-card: #FFFFFF;
+  --brand-hover: #F3F4F6;
+  --brand-border: #E5E7EB;
+
+  --brand-text: #111827;
+  --brand-muted: #6B7280;
+
+  --brand-accent: #C9A035;
+  --brand-accent-hover: #A8832A;
+
+  --brand-navy: #1C2B4A;
+  --brand-navy-hover: #142038;
+  --brand-gold: #C9A035;
+  --brand-gold-light: #FEF3CD;
+}
+
+.dark {
+  --background: #090B10;
+  --foreground: #F3F4F6;
+
+  --brand-beige: #090B10;
+  --brand-card: #141822;
+  --brand-hover: #1F2636;
+  --brand-border: #2A3346;
+
+  --brand-text: #F3F4F6;
+  --brand-muted: #9CA3AF;
+
+  --brand-accent: #E5B842;
+  --brand-accent-hover: #F5C953;
+
+  --brand-navy: #1E283D;
+  --brand-navy-hover: #293652;
+  --brand-gold: #E5B842;
+  --brand-gold-light: #2E2714;
+}
+
+@theme {
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-body: var(--font-dm), system-ui, sans-serif;
+  
+  --color-brand-beige: var(--brand-beige);
+  --color-brand-card: var(--brand-card);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-border: var(--brand-border);
+
+  --color-brand-text: var(--brand-text);
+  --color-brand-muted: var(--brand-muted);
+
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-hover: var(--brand-navy-hover);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+
+  --color-brand-secondary: var(--brand-navy);
+  --color-brand-secondary-hover: var(--brand-navy-hover);
+
+  --color-brand-success: #10B981;
+  --color-brand-warning: #F59E0B;
+  --color-brand-error: #EF4444;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* =============================================
+   DARK MODE OVERRIDES & HARMONISATIONS
+   ============================================= */
+.dark .bg-white {
+  background-color: #141822 !important;
+}
+.dark .bg-white\/90,
+.dark .bg-white\/95 {
+  background-color: rgba(20, 24, 34, 0.94) !important;
+}
+.dark .bg-\[\#FFFFFF\] {
+  background-color: #141822 !important;
+}
+.dark .bg-\[\#F5F5F3\] {
+  background-color: #0E121B !important;
+}
+.dark .text-\[\#1C2B4A\] {
+  color: #F3F4F6 !important;
+}
+.dark .text-\[\#6B7A94\],
+.dark .text-\[\#94A3B8\] {
+  color: #9CA3AF !important;
+}
+.dark .border-\[\#E2E8F0\] {
+  border-color: #2A3346 !important;
+}
+.dark input:not([type="checkbox"]),
+.dark select,
+.dark textarea {
+  background-color: #141822;
+  color: #F3F4F6;
+  border-color: #2A3346;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6B7280;
+}
+
+/* =============================================
+   TEXTURE DE FOND PREMIUM (effet grain)
+   ============================================= */
+.grain-bg {
+  position: relative;
+}
+.grain-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* =============================================
+   MICRO-INTERACTIONS & HOVER EFFECTS
+   ============================================= */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(28, 43, 74, 0.14), 0 4px 8px -2px rgba(201, 160, 53, 0.08);
+}
+
+.btn-transition {
+  transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-transition:hover {
+  transform: scale(1.02);
+}
+.btn-transition:active {
+  transform: scale(0.98);
+}
+
+/* =============================================
+   KEYFRAMES — ANIMATIONS DE BASE
+   ============================================= */
+
+/* Fade in doux (utilisé partout) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale up (pour les modales et succès) */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in depuis la droite */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in depuis le haut */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer pour skeletons */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Float doux — icônes décoratives */
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Pulse gold glow — accordé au brand Or */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 160, 53, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(201, 160, 53, 0.10); }
+}
+
+/* Fade in stagger pour les listes */
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================
+   CLASSES D'ANIMATION
+   ============================================= */
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-float {
+  animation: floatSoft 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Stagger children — appliqué au parent */
+.stagger-children > * {
+  animation: staggerFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 320ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 560ms; }
+
+/* =============================================
+   SCROLLBAR PERSONNALISÉE
+   ============================================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F4EE;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A035;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1C2B4A;
+}
+
+/* =============================================
+   FOCUS RING GLOBAL — ACCESSIBILITÉ (Or)
+   ============================================= */
+:focus-visible {
+  outline: 2px solid #C9A035;
+  outline-offset: 2px;
+}
+
+/* =============================================
+   SELECTION COULEUR ACCENT (Or)
+   ============================================= */
+::selection {
+  background-color: rgba(201, 160, 53, 0.18);
+  color: #1C2B4A;
+}
