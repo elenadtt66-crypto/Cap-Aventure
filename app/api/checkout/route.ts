@@ -12,17 +12,20 @@ export async function POST(request: Request) {
     const unitAmount = Math.round((parseFloat(amount) || 100) * 100);
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'https://cap-aventures.fr';
 
-    if (!stripeSecretKey || !stripeSecretKey.startsWith('sk_')) {
+    const rawKey = process.env.STRIPE_SECRET_KEY || '';
+    const cleanKey = rawKey.trim().replace(/^["']|["']$/g, '');
+
+    if (!cleanKey || (!cleanKey.startsWith('sk_') && !cleanKey.startsWith('rk_'))) {
       return NextResponse.json(
         {
           hasStripe: false,
-          error: 'Clé secrète Stripe (STRIPE_SECRET_KEY) non configurée dans les variables d\'environnement du serveur.',
+          error: 'Clé secrète Stripe (STRIPE_SECRET_KEY) invalide ou non configurée. Elle doit commencer par sk_ ou rk_.',
         },
         { status: 400 }
       );
     }
 
-    const stripe = new Stripe(stripeSecretKey);
+    const stripe = new Stripe(cleanKey);
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
