@@ -298,7 +298,7 @@ function ReservationContent() {
                 ) : (
                   <>
                     <CardIcon className="w-4 h-4" />
-                    <span>Passer au paiement de {priceBreakdown.total} € (Carte CB / Virement / Apple Pay)</span>
+                    <span>Passez au paiement</span>
                   </>
                 )}
               </button>
