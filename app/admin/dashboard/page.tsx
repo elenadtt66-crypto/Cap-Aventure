@@ -16,7 +16,6 @@ import {
   Activity,
   Check,
   X,
-  Eye,
   Phone,
   Mail,
   User,
@@ -26,16 +25,14 @@ import {
   Calendar,
   CreditCard,
   Ban,
-  FileText
+  Sparkles
 } from 'lucide-react';
 import StatsCard from '@/components/admin/StatsCard';
 import { getVehicles, getReservations, getClients, updateReservationStatus } from '@/services/db';
 import { Vehicle, Reservation, Client, ReservationStatus } from '@/types';
 import Link from 'next/link';
-import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import SelectMenu, { SelectMenuOption } from '@/components/ui/SelectMenu';
-import Button from '@/components/ui/Button';
 
 const statusConfig: Record<string, { label: string; bg: string; text: string; icon: React.ElementType }> = {
   EN_ATTENTE:  { label: 'En attente',  bg: 'bg-[#CA8A04]/10', text: 'text-[#CA8A04]', icon: AlertCircle },
@@ -654,25 +651,60 @@ export default function Dashboard() {
                     </span>
                   </p>
                 </div>
-
-                {selectedRes.specificDetails?.departureTime && (
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] text-brand-muted uppercase font-bold">Horaires convenus</span>
-                    <p className="font-medium text-brand-text">
-                      Départ: {selectedRes.specificDetails.departureTime} · Retour: {selectedRes.specificDetails.returnTime || '18:00'}
-                    </p>
-                  </div>
-                )}
-
-                {selectedRes.specificDetails?.destinationCountry && (
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] text-brand-muted uppercase font-bold">Zone / Destination</span>
-                    <p className="font-medium text-brand-text">
-                      {selectedRes.specificDetails.destinationCountry}
-                    </p>
-                  </div>
-                )}
               </div>
+
+              {/* Options & Équipements spécifiques du séjour */}
+              {selectedRes.specificDetails && (
+                <div className="pt-2 border-t border-brand-border/70 space-y-2">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold block flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-brand-accent" />
+                    Options & Spécificités
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedRes.specificDetails.outdoorShower && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🚿 Douchette extérieure
+                      </span>
+                    )}
+                    {selectedRes.specificDetails.portableToilet && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🚽 WC chimique portable
+                      </span>
+                    )}
+                    {selectedRes.specificDetails.roofTent && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        ⛺ Tente de toit
+                      </span>
+                    )}
+                    {Boolean(selectedRes.specificDetails.bikeRackCount) && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🚲 Porte-vélos ({selectedRes.specificDetails.bikeRackCount} vélos)
+                      </span>
+                    )}
+                    {selectedRes.specificDetails.luxuryLinenPack && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🛏️ Pack Linge Confort
+                      </span>
+                    )}
+                    {selectedRes.specificDetails.finalCleaningService && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🧹 Forfait Ménage
+                      </span>
+                    )}
+                    {selectedRes.specificDetails.allowPets && (
+                      <span className="px-2 py-0.5 bg-brand-beige border border-brand-border rounded-md text-[11px] font-medium text-brand-text">
+                        🐾 Animaux acceptés
+                      </span>
+                    )}
+                  </div>
+
+                  {selectedRes.specificDetails.notes && (
+                    <p className="mt-2 text-[11px] text-brand-text bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/50">
+                      <strong>Remarque client :</strong> &laquo; {selectedRes.specificDetails.notes} &raquo;
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Bloc Financier & Total */}

@@ -40,7 +40,7 @@ export interface Vehicle {
   rating: number;
   reviewCount: number;
   reviews: Review[];
-  createdAt?: any; // Firestore Timestamp
+  createdAt?: any; // Firestore / DB Timestamp
 }
 
 export interface Client {
@@ -50,10 +50,34 @@ export interface Client {
   email: string;
   phone: string;
   drivingLicenseNumber: string;
-  createdAt?: any; // Firestore Timestamp
+  createdAt?: any; // Firestore / DB Timestamp
 }
 
 export type ReservationStatus = 'EN_ATTENTE' | 'CONFIRMEE' | 'ANNULEE' | 'TERMINEE';
+
+export interface ReservationSpecificDetails {
+  // Options Van
+  outdoorShower?: boolean;
+  portableToilet?: boolean;
+  roofTent?: boolean;
+  
+  // Options Profilé
+  bedLayout?: 'JUMEAUX' | 'CENTRAL';
+  bikeRackCount?: number;
+  
+  // Options Intégral
+  hasLargeVehicleExperience?: boolean;
+  luxuryLinenPack?: boolean;
+  finalCleaningService?: boolean;
+  
+  // Options Fourgon
+  sportsEquipmentStorage?: boolean;
+  sportsEquipmentType?: string;
+  allowPets?: boolean;
+  
+  // Autres remarques
+  notes?: string;
+}
 
 export interface Reservation {
   id: string;
@@ -66,28 +90,6 @@ export interface Reservation {
   totalDays: number;
   totalPrice: number;
   status: ReservationStatus;
-  createdAt?: any; // Firestore Timestamp
-  specificDetails: {
-    // Options Van
-    outdoorShower?: boolean;
-    portableToilet?: boolean;
-    roofTent?: boolean;
-    
-    // Options Profilé
-    bedLayout?: 'JUMEAUX' | 'CENTRAL';
-    bikeRackCount?: number;
-    
-    // Options Intégral
-    hasLargeVehicleExperience?: boolean;
-    luxuryLinenPack?: boolean;
-    finalCleaningService?: boolean;
-    
-    // Options Fourgon
-    sportsEquipmentStorage?: boolean;
-    sportsEquipmentType?: string;
-    allowPets?: boolean;
-    
-    // Autres remarques
-    notes?: string;
-  };
+  createdAt?: any; // Firestore / DB Timestamp
+  specificDetails?: ReservationSpecificDetails;
 }
