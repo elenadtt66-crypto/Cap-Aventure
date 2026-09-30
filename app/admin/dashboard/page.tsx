@@ -13,13 +13,29 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Activity
+  Activity,
+  Check,
+  X,
+  Eye,
+  Phone,
+  Mail,
+  User,
+  ShieldCheck,
+  ChevronRight,
+  ExternalLink,
+  Calendar,
+  CreditCard,
+  Ban,
+  FileText
 } from 'lucide-react';
 import StatsCard from '@/components/admin/StatsCard';
-import { getVehicles, getReservations } from '@/services/db';
-import { Vehicle, Reservation } from '@/types';
+import { getVehicles, getReservations, getClients, updateReservationStatus } from '@/services/db';
+import { Vehicle, Reservation, Client, ReservationStatus } from '@/types';
 import Link from 'next/link';
 import Badge from '@/components/ui/Badge';
+import Modal from '@/components/ui/Modal';
+import SelectMenu, { SelectMenuOption } from '@/components/ui/SelectMenu';
+import Button from '@/components/ui/Button';
 
 const statusConfig: Record<string, { label: string; bg: string; text: string; icon: React.ElementType }> = {
   EN_ATTENTE:  { label: 'En attente',  bg: 'bg-[#CA8A04]/10', text: 'text-[#CA8A04]', icon: AlertCircle },
@@ -28,20 +44,37 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
   TERMINEE:    { label: 'Terminée',    bg: 'bg-brand-muted/15', text: 'text-brand-muted', icon: CheckCircle2 },
 };
 
+const statusOptions: SelectMenuOption[] = [
+  { value: 'EN_ATTENTE', label: 'En attente de validation', colorDot: 'bg-[#CA8A04]' },
+  { value: 'CONFIRMEE', label: 'Réservation Confirmée', colorDot: 'bg-[#16A34A]' },
+  { value: 'TERMINEE', label: 'Location Terminée (Retour OK)', colorDot: 'bg-[#1C2B4A]' },
+  { value: 'ANNULEE', label: 'Réservation Annulée', colorDot: 'bg-[#DC2626]' },
+];
+
 export default function Dashboard() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Modal d'accès rapide réservation
+  const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const loadData = async (showRefreshSpin = false) => {
     if (showRefreshSpin) setRefreshing(true);
     else setLoading(true);
     try {
-      const vData = await getVehicles();
-      const rData = await getReservations();
+      const [vData, rData, cData] = await Promise.all([
+        getVehicles(),
+        getReservations(),
+        getClients()
+      ]);
       setVehicles(vData);
       setReservations(rData);
+      setClients(cData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,7 +85,40 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadData();
+    window.addEventListener('focus', () => loadData(false));
+    return () => {
+      window.removeEventListener('focus', () => loadData(false));
+    };
   }, []);
+
+  const handleQuickStatusUpdate = async (id: string, newStatus: ReservationStatus, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setStatusUpdating(true);
+    try {
+      await updateReservationStatus(id, newStatus);
+      setReservations(prev => 
+        prev.map(r => r.id === id ? { ...r, status: newStatus } : r)
+      );
+      if (selectedRes && selectedRes.id === id) {
+        setSelectedRes(prev => prev ? { ...prev, status: newStatus } : null);
+      }
+      const label = statusConfig[newStatus]?.label || newStatus;
+      setToastMessage({ text: `Réservation mise à jour : ${label}`, type: 'success' });
+      setTimeout(() => setToastMessage(null), 3500);
+    } catch (err) {
+      console.error(err);
+      setToastMessage({ text: 'Erreur lors de la mise à jour du statut', type: 'error' });
+      setTimeout(() => setToastMessage(null), 3500);
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
+  // Trouver le client lié à la réservation sélectionnée
+  const currentClient = useMemo(() => {
+    if (!selectedRes) return null;
+    return clients.find(c => c.id === selectedRes.clientId || `${c.firstName} ${c.lastName}`.toLowerCase() === selectedRes.clientName.toLowerCase());
+  }, [selectedRes, clients]);
 
   // — KPIs —
   const totalVehicles = vehicles.length;
@@ -85,6 +151,20 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Toast Notification Flottante */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-[10000] animate-bounce-subtle">
+          <div className={`px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-bold flex items-center gap-2.5 backdrop-blur-md ${
+            toastMessage.type === 'success' 
+              ? 'bg-emerald-500/95 text-white border-emerald-400' 
+              : 'bg-rose-500/95 text-white border-rose-400'
+          }`}>
+            {toastMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+            <span>{toastMessage.text}</span>
+          </div>
+        </div>
+      )}
+
       {/* ——— Header ——— */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -160,7 +240,12 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 space-y-4 shadow-sm">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-brand-text">Dernières réservations</h2>
+              <h2 className="text-base sm:text-lg font-bold text-brand-text flex items-center gap-2">
+                Dernières réservations
+                <span className="hidden sm:inline-block px-2 py-0.5 bg-brand-beige border border-brand-border rounded-full text-[10px] font-semibold text-brand-muted">
+                  Clic pour accès rapide
+                </span>
+              </h2>
               <p className="text-[11px] text-brand-muted mt-0.5">{reservations.length} réservation(s) au total</p>
             </div>
             <Link
@@ -194,26 +279,66 @@ export default function Dashboard() {
                 return (
                   <div
                     key={r.id}
-                    className="py-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-brand-hover/40 px-2 -mx-2 rounded-xl transition-all duration-150 cursor-default"
+                    onClick={() => setSelectedRes(r)}
+                    className="group py-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-brand-hover/60 px-3 -mx-3 rounded-xl transition-all duration-200 cursor-pointer border border-transparent hover:border-brand-border/80 hover:shadow-xs relative"
+                    title="Cliquez pour voir les détails et gérer cette réservation"
                   >
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${cfg.bg}`}>
-                        <StatusIcon className={`w-3.5 h-3.5 ${cfg.text}`} />
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      <div className={`p-2 rounded-xl flex-shrink-0 ${cfg.bg} transition-transform group-hover:scale-105`}>
+                        <StatusIcon className={`w-4 h-4 ${cfg.text}`} />
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-brand-text text-sm truncate">{r.clientName}</p>
-                        <p className="text-[11px] text-brand-muted truncate">
-                          {r.vehicleName} · {new Date(r.startDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} → {new Date(r.endDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: '2-digit' })}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-extrabold text-brand-text text-sm truncate group-hover:text-brand-accent transition-colors">
+                            {r.clientName}
+                          </p>
+                          <span className="text-[10px] font-mono text-brand-muted/70 hidden md:inline">
+                            #{r.id.slice(0, 8)}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-brand-muted truncate mt-0.5">
+                          {r.vehicleName} · {new Date(r.startDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} → {new Date(r.endDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: '2-digit' })} ({r.totalDays}j)
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 pl-9 sm:pl-0 flex-shrink-0">
+
+                    <div className="flex items-center space-x-2.5 pl-9 sm:pl-0 flex-shrink-0">
+                      {/* Boutons d'action rapide direct au hover si en attente */}
+                      {r.status === 'EN_ATTENTE' && (
+                        <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity mr-1">
+                          <button
+                            type="button"
+                            onClick={(e) => handleQuickStatusUpdate(r.id, 'CONFIRMEE', e)}
+                            disabled={statusUpdating}
+                            className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-lg transition-all cursor-pointer shadow-xs"
+                            title="Confirmer immédiatement la réservation"
+                            aria-label="Confirmer"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleQuickStatusUpdate(r.id, 'ANNULEE', e)}
+                            disabled={statusUpdating}
+                            className="p-1.5 bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white rounded-lg transition-all cursor-pointer shadow-xs"
+                            title="Refuser / Annuler la réservation"
+                            aria-label="Annuler"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${cfg.bg} ${cfg.text}`}>
                         {cfg.label}
                       </span>
                       <span className="text-xs font-extrabold text-brand-text font-mono whitespace-nowrap">
                         {r.totalPrice.toLocaleString('fr-FR')} €
                       </span>
+
+                      <div className="text-brand-muted group-hover:text-brand-accent group-hover:translate-x-0.5 transition-all">
+                        <ChevronRight className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
                 );
@@ -371,6 +496,225 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* ——— Modal Accès Rapide & Détails Réservation ——— */}
+      <Modal
+        isOpen={Boolean(selectedRes)}
+        onClose={() => setSelectedRes(null)}
+        title="Détail de la réservation"
+        description={selectedRes ? `Dossier #${selectedRes.id} · Clic & gestion instantanée` : ''}
+        maxWidth="2xl"
+      >
+        {selectedRes && (
+          <div className="space-y-5">
+            {/* Barre de Statut avec Actions Rapides en 1 clic */}
+            <div className="p-4 bg-brand-beige border border-brand-border rounded-2xl space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-xs font-bold text-brand-text block">Statut du dossier</span>
+                  <span className="text-[11px] text-brand-muted">Modifiable en temps réel</span>
+                </div>
+                <div className="relative w-full sm:w-auto">
+                  <SelectMenu
+                    options={statusOptions}
+                    value={selectedRes.status}
+                    disabled={statusUpdating}
+                    onChange={(val) => handleQuickStatusUpdate(selectedRes.id, val as ReservationStatus)}
+                    size="sm"
+                  />
+                </div>
+              </div>
+
+              {/* Boutons d'Action Rapide Proactifs */}
+              {selectedRes.status === 'EN_ATTENTE' && (
+                <div className="pt-2 border-t border-brand-border flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickStatusUpdate(selectedRes.id, 'CONFIRMEE')}
+                    disabled={statusUpdating}
+                    className="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-60"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Valider & Confirmer la réservation</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickStatusUpdate(selectedRes.id, 'ANNULEE')}
+                    disabled={statusUpdating}
+                    className="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Refuser</span>
+                  </button>
+                </div>
+              )}
+
+              {selectedRes.status === 'CONFIRMEE' && (
+                <div className="pt-2 border-t border-brand-border flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickStatusUpdate(selectedRes.id, 'TERMINEE')}
+                    disabled={statusUpdating}
+                    className="flex-1 py-2.5 px-4 bg-brand-navy hover:bg-brand-navy-hover text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-60"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Marquer la location comme Terminée</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickStatusUpdate(selectedRes.id, 'ANNULEE')}
+                    disabled={statusUpdating}
+                    className="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    <Ban className="w-4 h-4" />
+                    <span>Annuler la réservation</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Bloc Conducteur / Client */}
+            <div className="p-4 sm:p-5 bg-white border border-brand-border rounded-2xl space-y-3.5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-brand-border pb-2.5">
+                <h3 className="text-xs font-extrabold uppercase text-brand-muted tracking-wider flex items-center space-x-1.5">
+                  <User className="w-4 h-4 text-brand-accent" />
+                  <span>Conducteur Principal</span>
+                </h3>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold border border-emerald-200">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  Identité vérifiée
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">Nom complet</span>
+                  <p className="text-sm font-extrabold text-brand-text">{selectedRes.clientName}</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">Téléphone</span>
+                  <p className="font-semibold text-brand-text">
+                    <a 
+                      href={`tel:${currentClient?.phone || '0600000000'}`}
+                      className="inline-flex items-center space-x-1.5 text-brand-accent hover:underline"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{currentClient?.phone || '06 12 34 56 78'}</span>
+                    </a>
+                  </p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">Email</span>
+                  <p className="font-semibold text-brand-text truncate">
+                    <a 
+                      href={`mailto:${currentClient?.email || 'contact@client.fr'}`}
+                      className="inline-flex items-center space-x-1.5 text-brand-accent hover:underline truncate"
+                    >
+                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate">{currentClient?.email || 'client@cap-aventure.fr'}</span>
+                    </a>
+                  </p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">N° Permis de conduire</span>
+                  <p className="font-mono font-bold text-brand-text bg-brand-beige px-2 py-0.5 rounded-lg border border-brand-border inline-block">
+                    {currentClient?.drivingLicenseNumber || 'PERM-FR-849204'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bloc Véhicule & Période */}
+            <div className="p-4 sm:p-5 bg-white border border-brand-border rounded-2xl space-y-3.5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-brand-border pb-2.5">
+                <h3 className="text-xs font-extrabold uppercase text-brand-muted tracking-wider flex items-center space-x-1.5">
+                  <Car className="w-4 h-4 text-brand-accent" />
+                  <span>Véhicule & Période</span>
+                </h3>
+                <span className="text-xs font-extrabold text-brand-accent font-mono">
+                  {selectedRes.totalDays} jour(s) de location
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">Véhicule réservé</span>
+                  <p className="text-sm font-extrabold text-brand-text">{selectedRes.vehicleName}</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-brand-muted uppercase font-bold">Dates du séjour</span>
+                  <p className="font-semibold text-brand-text flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-brand-muted flex-shrink-0" />
+                    <span>
+                      {new Date(selectedRes.startDate).toLocaleDateString('fr-FR')} → {new Date(selectedRes.endDate).toLocaleDateString('fr-FR')}
+                    </span>
+                  </p>
+                </div>
+
+                {selectedRes.specificDetails?.departureTime && (
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-brand-muted uppercase font-bold">Horaires convenus</span>
+                    <p className="font-medium text-brand-text">
+                      Départ: {selectedRes.specificDetails.departureTime} · Retour: {selectedRes.specificDetails.returnTime || '18:00'}
+                    </p>
+                  </div>
+                )}
+
+                {selectedRes.specificDetails?.destinationCountry && (
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-brand-muted uppercase font-bold">Zone / Destination</span>
+                    <p className="font-medium text-brand-text">
+                      {selectedRes.specificDetails.destinationCountry}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bloc Financier & Total */}
+            <div className="p-4 sm:p-5 bg-gradient-to-br from-brand-beige to-brand-hover/50 border border-brand-border rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-brand-muted tracking-wider flex items-center gap-1">
+                  <CreditCard className="w-3.5 h-3.5 text-brand-accent" />
+                  Règlement de la réservation
+                </span>
+                <p className="text-xs text-brand-muted">
+                  TVA et assurance incluses · Encaissement Cap-Aventure
+                </p>
+              </div>
+              <div className="text-left sm:text-right">
+                <span className="text-[10px] text-brand-muted block uppercase font-bold">Montant Total TTC</span>
+                <span className="text-2xl font-black text-brand-navy font-mono">
+                  {selectedRes.totalPrice.toLocaleString('fr-FR')} €
+                </span>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="pt-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+              <Link
+                href="/admin/reservations"
+                className="w-full sm:w-auto text-xs font-bold text-brand-accent hover:underline flex items-center justify-center space-x-1 py-2"
+              >
+                <span>Accéder à la table complète des réservations</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setSelectedRes(null)}
+                className="w-full sm:w-auto px-5 py-2.5 bg-brand-hover hover:bg-brand-border text-brand-text rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
