@@ -532,7 +532,7 @@ export async function getReservations(): Promise<Reservation[]> {
         .order('created_at', { ascending: false });
 
       if (data && data.length > 0) {
-        return data.map((r: any) => ({
+        const mapped = data.map((r: any) => ({
           id: r.id,
           vehicleId: r.vehicle_id || '',
           vehicleName: r.vehicle_name || '',
@@ -545,6 +545,9 @@ export async function getReservations(): Promise<Reservation[]> {
           status: (r.status as ReservationStatus) || 'EN_ATTENTE',
           specificDetails: r.specific_details || {},
         }));
+        inMemoryReservations = mapped;
+        saveStoredReservations(mapped);
+        return mapped;
       }
     } catch (sbErr) {
       console.warn('Supabase fetch reservations error:', sbErr);
@@ -596,7 +599,7 @@ export async function getClients(): Promise<Client[]> {
         .order('created_at', { ascending: false });
 
       if (data && data.length > 0) {
-        return data.map((c: any) => ({
+        const mapped = data.map((c: any) => ({
           id: c.id,
           firstName: c.first_name || '',
           lastName: c.last_name || '',
@@ -604,6 +607,8 @@ export async function getClients(): Promise<Client[]> {
           phone: c.phone || '',
           drivingLicenseNumber: c.driving_license_number || '',
         }));
+        saveStoredClients(mapped);
+        return mapped;
       }
     } catch (err) {
       console.warn('Supabase getClients error:', err);

@@ -70,11 +70,18 @@ export default function AdminReservations() {
 
   useEffect(() => {
     loadData();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadData();
+      }
+    };
     window.addEventListener('focus', loadData);
     window.addEventListener('storage', loadData);
+    document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       window.removeEventListener('focus', loadData);
       window.removeEventListener('storage', loadData);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 

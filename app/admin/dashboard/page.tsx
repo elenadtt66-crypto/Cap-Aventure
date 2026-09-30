@@ -82,9 +82,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadData();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadData(false);
+      }
+    };
     window.addEventListener('focus', () => loadData(false));
+    window.addEventListener('storage', () => loadData(false));
+    document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       window.removeEventListener('focus', () => loadData(false));
+      window.removeEventListener('storage', () => loadData(false));
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
